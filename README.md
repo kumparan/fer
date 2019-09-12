@@ -1,2 +1,2 @@
-# fif
-FIF is not Ferdian
+# fer
+fer is not Ferdian
