@@ -13,19 +13,19 @@ var installCmd = &cobra.Command{
 	Long:  "This subcommand start the test",
 }
 
-var installChgLogCmd = &cobra.Command{
+var chgLogCmd = &cobra.Command{
 	Use:   "chglog",
 	Short: "install all dependencies to generate changelog",
 	Long:  "This subcommand to install git change-log",
-	RunE:  chglog,
+	RunE:  installchglogCmd,
 }
 
 func init() {
-	installCmd.AddCommand(installChgLogCmd)
+	installCmd.AddCommand(chgLogCmd)
 	RootCmd.AddCommand(installCmd)
 }
 
-func chglog(cmd *cobra.Command, args []string) error {
+func installchglogCmd(cmd *cobra.Command, args []string) error {
 	return installChglog(context.TODO())
 }
 
