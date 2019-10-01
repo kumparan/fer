@@ -1,0 +1,20 @@
+syntax = "proto3";
+package pb.content;
+option go_package = "content";
+
+import "pb/content/content_service_topic.proto";
+import "pb/content/content_service_general.proto";
+import "pb/content/topic.proto";
+
+
+
+service ContentService{
+    // Topic
+    rpc CreateTopic(CreateTopicRequest) returns (Topic) {}
+    rpc DeleteTopicByID(DeleteByIDRequest) returns (Empty) {}
+
+    // Story
+    rpc CreateStory(CreateTopicRequest) returns (Topic){}
+    rpc DeleteStoryByID(DeleteByIDRequest) returns (Empty){}
+}
+

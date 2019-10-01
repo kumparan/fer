@@ -1,0 +1,37 @@
+syntax = "proto3";
+package pb.content;
+option go_package = "content";
+
+message Topic {
+    int64 id = 1;
+    string name = 2;
+    string slug = 3;
+    string description = 4;
+    bool is_active = 5;
+    bool is_private = 6;
+    bool is_special = 7;
+    bool is_show_topic_cover = 8;
+    int64 cover_media_id = 9;
+    string created_at = 10;
+    string updated_at = 11;
+    string deleted_at = 12;
+    bool is_active_collection_topic = 13;
+    bool is_collection_topic = 14;
+    int64 created_by = 15;
+    int64 last_updated_by = 16;
+    string meta_name = 17;
+    string meta_description = 18;
+    string meta_keywords = 19;
+}
+
+message Topics {
+    repeated Topic topics = 1;
+}
+
+message TopicMenu {
+    int64 topic_id = 1;
+    int64 position = 2;
+    string created_at = 3;
+    string updated_at = 4;
+    string deleted_at = 5;
+}
