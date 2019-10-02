@@ -11,7 +11,7 @@ import (
 	jen "github.com/dave/jennifer/jen" //Code generator
 )
 
-const(
+const (
 	packageName = "service"
 )
 
@@ -24,9 +24,9 @@ type (
 		CreateTestFunctionName(in string) string
 	}
 	service struct {
-		name      string
-		url       string
-		protoPath string
+		name                string
+		url                 string
+		protoPath           string
 		serviceURLProtoPath string
 	}
 )

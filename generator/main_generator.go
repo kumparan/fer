@@ -1,13 +1,11 @@
 package generator
 
 import (
-	"bytes"
 	"fmt"
 	"io/ioutil"
 
 	"github.com/kumparan/fer/util"
 
-	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -18,10 +16,11 @@ const (
 	scaffold = "scaffold.sh"
 	proto2go = "proto2go.sh"
 	template = "template.sh"
-	bash = "bash"
+	bash     = "bash"
 )
 
 type (
+	//Generator define generator
 	Generator interface {
 		Run(serviceName, protoPath string)
 	}
@@ -31,6 +30,7 @@ type (
 	}
 )
 
+//NewGenerator :nodoc:
 func NewGenerator() Generator {
 	return &generator{}
 }
@@ -106,14 +106,8 @@ func GetTemplates(serviceName string) {
 	defer func() {
 		_ = os.Remove(template)
 	}()
-	cmd := exec.Command(bash, template, serviceName)
-	cmd.Stdin = strings.NewReader("")
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	err := cmd.Run()
-	if err != nil {
-		log.Fatal(err)
-	}
+	exec.Command(bash, template, serviceName)
+
 }
 
 //GenerateProto2Go :nodoc:
@@ -129,16 +123,18 @@ func GenerateProto2Go(path string) {
 	defer func() {
 		_ = os.Remove(proto2go)
 	}()
-	pathArr := strings.Split(path,"/")
+	pathArr := strings.Split(path, "/")
 	pathArr = pathArr[:len(pathArr)-1]
-	path = strings.Join(pathArr,"/")
-	_= exec.Command(bash, proto2go, path )
+	path = strings.Join(pathArr, "/")
+	_ = exec.Command(bash, proto2go, path)
 }
 
 //RunScaffold to run scaffold script
 func RunScaffold(serviceName string) {
 	exec.Command(bash, scaffold, serviceName)
-	_ = os.Remove(scaffold)
+	defer func() {
+		_ = os.Remove(scaffold)
+	}()
 }
 
 func splitBetweenTwoChar(str, before, after string) string {

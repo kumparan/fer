@@ -18,6 +18,7 @@ type Function struct {
 }
 
 type (
+	//Client define client
 	Client interface {
 		Generate()
 	}
@@ -30,6 +31,7 @@ type (
 	}
 )
 
+//NewRPCClientGenerator :nodoc:
 func NewRPCClientGenerator(protoPath string, serviceName string, serviceRepo string) Client {
 	return &client{
 		serviceName:     serviceName,
@@ -88,6 +90,7 @@ func (c client) Generate() {
 
 }
 
+//CreateFunctionArgsClient :nodoc:
 func (c client) CreateFunctionArgsClient(in string) (args []jen.Code) {
 	strlong := splitBetweenTwoChar(in, "(", ")")
 	strs := strings.Split(strlong, ", ")
@@ -147,7 +150,7 @@ func (c client) ParseProtoToArray(serviceName string, path string) ([]Function, 
 		}
 	}
 	for _, v := range protoFunctions {
-		params := c.splitFunctionParameters(v)
+		params := c.SplitFunctionParameters(v)
 		services = append(services, params)
 	}
 
@@ -157,7 +160,8 @@ func (c client) ParseProtoToArray(serviceName string, path string) ([]Function, 
 	return services, nil
 }
 
-func (c client) splitFunctionParameters(function string) Function {
+//SplitFunctionParameters :nodoc:
+func (c client) SplitFunctionParameters(function string) Function {
 	splittedFunction := strings.Split(function, "(")
 	for k := range splittedFunction {
 		splittedFunction[k] = strings.Replace(splittedFunction[k], ")", "", -1)
