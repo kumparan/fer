@@ -1,0 +1,8 @@
+syntax = "proto3";
+package pb.content;
+option go_package = "example";
+
+message Story {
+    int64 id = 1;
+}
+

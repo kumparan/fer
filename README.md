@@ -9,19 +9,19 @@ you can make microservices start from proto. see the proto example in `pb/` fold
 you need to create proto file with services RPC with path like this
 `pb/'$service/$protoname.proto`
 
-example (see the proto example in `pb/`)
+example (see the proto example in folder `pb/`)
+`pb/content/content_service.proto`
 ```
 service ContentService{
-     // Topic  << define the domain
+     // Topic  << you must define the domain
      rpc CreateTopic(CreateTopicRequest) returns (Topic) {}
      rpc DeleteTopicByID(DeleteByIDRequest) returns (Empty) {}
  
-     // Story  << define the domain
+     // Story  << you must define the domain
      rpc CreateStory(CreateTopicRequest) returns (Topic){}
      rpc DeleteStoryByID(DeleteByIDRequest) returns (Empty){}
  }
 ```
-`pb/content/content_service.proto`
 
 and create microservices
 `fer project --name content-service`
@@ -73,9 +73,7 @@ It should be available as command now in terminal
 ## Feature
 -   [x] Scaffold New Microservices
 -   [x] Generate Service&test files and Client files From Proto
--   [ ] Go Installer
--   [ ] Proto Installer
 -   [ ] Generate Repository (include model)
 -   [ ] Add worker with command
 -   [ ] Add Nats Subscriber with command
--   [ ] Add db migration file with command
+-   [ ] db migration file generator

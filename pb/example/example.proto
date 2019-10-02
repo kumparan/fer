@@ -1,0 +1,20 @@
+syntax = "proto3";
+package pb.content;
+option go_package = "example";
+
+import "pb/example/example_service_general.proto";
+import "pb/example/story.proto";
+import "pb/example/topic.proto";
+
+
+
+service ExampleService{
+    // Topic
+    rpc CreateTopicExample(CreateRequestExample) returns (Topic) {}
+    rpc DeleteTopicByID(DeleteByIDRequestExample) returns (Empty) {}
+
+    // Story
+    rpc CreateStoryExample(CreateRequestExample) returns (Story){}
+    rpc DeleteStoryByID(DeleteByIDRequestExample) returns (Empty){}
+}
+

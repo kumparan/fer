@@ -10,26 +10,40 @@ import (
 	jen "github.com/dave/jennifer/jen" //Code generator
 )
 
-// Service :nodoc:
-type Service struct {
+// Function :nodoc:
+type Function struct {
 	Name       string
 	Parameters []string
 	Returns    []string
 }
 
-var (
-	serviceURL        string
-	serviceClientName string
-	serviceURLProto   string
+type (
+	Client interface {
+		Generate()
+	}
+	client struct {
+		protoPath         string
+		serviceName       string
+		serviceURL        string
+		serviceURLProto   string
+		serviceClientName string
+	}
 )
 
-// GenerateRPCClient ... :nodoc:
-func GenerateRPCClient(path string, serviceName string, serviceRepo string) {
+func NewRPCClientGenerator(protoPath string, serviceName string, serviceRepo string) Client {
+	return &client{
+		serviceName:     serviceName,
+		protoPath:       protoPath,
+		serviceURL:      serviceRepo,
+		serviceURLProto: serviceRepo + "/pb/" + createSimpleNameFromProtoPath(protoPath),
+	}
+}
+
+//Generate ...
+func (c client) Generate() {
 	f := jen.NewFile("client")
-	serviceURL = serviceRepo
-	serviceObj, _ := ParseProtoToArray(serviceName, path)
-	serviceURLProto = serviceURL + "/pb/" + getSimpleNameFromProtoPath(path)
-	f.ImportAlias(serviceURLProto, "pb")
+	serviceObj, _ := c.ParseProtoToArray(c.serviceName, c.protoPath)
+	f.ImportAlias(c.serviceURLProto, "pb")
 	for _, v := range serviceObj {
 		var returns string
 		var bodyReturn string
@@ -56,25 +70,25 @@ func GenerateRPCClient(path string, serviceName string, serviceRepo string) {
 		returns = "( " + returns + " )"
 		f.Func().Params(
 			jen.Id("c").Op("*").Id("client"),
-		).Id(v.Name).Params(getFunctionArgsClient(jParam)...).Id(returns).Block(
-			AddConn(),
-			AddErrChecker(),
-			CloseConn(),
-			AddNewClient(serviceClientName),
-			jen.Return(AddClientReturn(v.Name)),
+		).Id(v.Name).Params(c.CreateFunctionArgsClient(jParam)...).Id(returns).Block(
+			c.CreateConn(),
+			c.CreateErrChecker(),
+			c.CreateCloseConn(),
+			c.CreateNewClient(c.serviceClientName),
+			jen.Return(c.CreateClientReturn(v.Name)),
 		)
 	}
 
 	buf := &bytes.Buffer{}
 	_ = f.Render(buf)
-	splitPath := strings.Split(path, "/")
+	splitPath := strings.Split(c.protoPath, "/")
 	savePath := splitPath[2]
 	savePath = strings.Replace(savePath, ".pb.go", ".go", -1)
-	_ = ioutil.WriteFile(serviceName+"/"+"client"+"/"+savePath, buf.Bytes(), 0644)
+	_ = ioutil.WriteFile(c.serviceName+"/"+"client"+"/"+savePath, buf.Bytes(), 0644)
 
 }
 
-func getFunctionArgsClient(in string) (args []jen.Code) {
+func (c client) CreateFunctionArgsClient(in string) (args []jen.Code) {
 	strlong := splitBetweenTwoChar(in, "(", ")")
 	strs := strings.Split(strlong, ", ")
 	strs = strs[1 : len(strs)-1]
@@ -85,7 +99,7 @@ func getFunctionArgsClient(in string) (args []jen.Code) {
 			argName := argItem[0]
 			argPath := strings.Split(argItem[1], ".")[0]
 			if strings.Contains(argPath, "pb") {
-				argPath = serviceURLProto
+				argPath = c.serviceURLProto
 			}
 			argType := strings.Split(argItem[1], ".")[1]
 			args = append(args, jen.Code(jen.Id(argName).Op("*").Qual(argPath, argType)))
@@ -97,7 +111,7 @@ func getFunctionArgsClient(in string) (args []jen.Code) {
 }
 
 // ParseProtoToArray ... :nodoc:
-func ParseProtoToArray(serviceName string, path string) ([]Service, error) {
+func (c client) ParseProtoToArray(serviceName string, path string) ([]Function, error) {
 	interfaceName := "Client" + " interface"
 	f, err := os.Open(path)
 	if err != nil {
@@ -110,13 +124,13 @@ func ParseProtoToArray(serviceName string, path string) ([]Service, error) {
 	scanner := bufio.NewScanner(f)
 
 	isServiceClient := false
-	services := []Service{}
+	services := []Function{}
 	protoFunctions := []string{}
 	for scanner.Scan() {
 		var text string
 		if strings.Contains(scanner.Text(), interfaceName) {
 			isServiceClient = true
-			serviceClientName = GetServiceClient(scanner.Text())
+			c.serviceClientName = c.CreateServiceClientName(scanner.Text())
 		}
 		if isServiceClient {
 			if strings.Contains(scanner.Text(), "//") {
@@ -133,7 +147,7 @@ func ParseProtoToArray(serviceName string, path string) ([]Service, error) {
 		}
 	}
 	for _, v := range protoFunctions {
-		params := splitFunctionParameters(v)
+		params := c.splitFunctionParameters(v)
 		services = append(services, params)
 	}
 
@@ -143,7 +157,7 @@ func ParseProtoToArray(serviceName string, path string) ([]Service, error) {
 	return services, nil
 }
 
-func splitFunctionParameters(function string) Service {
+func (c client) splitFunctionParameters(function string) Function {
 	splittedFunction := strings.Split(function, "(")
 	for k := range splittedFunction {
 		splittedFunction[k] = strings.Replace(splittedFunction[k], ")", "", -1)
@@ -151,18 +165,18 @@ func splitFunctionParameters(function string) Service {
 	params := strings.Split(splittedFunction[1], ",")
 	returns := strings.Split(splittedFunction[2], ",")
 
-	newService := Service{Name: splittedFunction[0], Parameters: params, Returns: returns}
+	newService := Function{Name: splittedFunction[0], Parameters: params, Returns: returns}
 	return newService
 }
 
-//AddConn to generate conn code
-func AddConn() (s *jen.Statement) {
+//CreateConn to generate conn code
+func (c client) CreateConn() (s *jen.Statement) {
 	s = jen.List(jen.Id("conn"), jen.Id("err")).Op(":=").Id("c").Dot("Conn").Dot("Get").Parens(jen.Id("ctx"))
 	return
 }
 
-//AddErrChecker to generate err checker
-func AddErrChecker() (s *jen.Statement) {
+//CreateErrChecker to generate err checker
+func (c client) CreateErrChecker() (s *jen.Statement) {
 	s = jen.If(
 		jen.Err().Op("!=").Nil(),
 	).Block(
@@ -171,27 +185,27 @@ func AddErrChecker() (s *jen.Statement) {
 	return
 }
 
-//CloseConn to generate close conn code
-func CloseConn() (s *jen.Statement) {
+//CreateCloseConn to generate close conn code
+func (c client) CreateCloseConn() (s *jen.Statement) {
 	s = jen.Defer().Func().Params().Block(
 		jen.Id("_").Op("=").Id("conn").Dot("Close()")).Call()
 	return
 }
 
-//AddNewClient to generate new client grpc
-func AddNewClient(client string) (s *jen.Statement) {
+//CreateNewClient to generate new client grpc
+func (c client) CreateNewClient(client string) (s *jen.Statement) {
 	s = jen.Id("cli").Op(":=").Id("pb").Dot("New" + client).Parens(jen.Id("conn").Dot("ClientConn"))
 	return
 }
 
-//AddClientReturn to generate client return
-func AddClientReturn(funcName string) (s *jen.Statement) {
+//CreateClientReturn to generate client return
+func (c client) CreateClientReturn(funcName string) (s *jen.Statement) {
 	s = jen.Id("cli").Dot(funcName).Parens(jen.List(jen.Id("ctx"), jen.Id("in"), jen.Id("opts...")))
 	return
 }
 
-//GetServiceClient to get service client name
-func GetServiceClient(text string) (client string) {
+//CreateServiceClientName to get service client name
+func (c client) CreateServiceClientName(text string) (client string) {
 	client = text
 	client = strings.ReplaceAll(client, "type", "")
 	client = strings.ReplaceAll(client, "interface", "")
