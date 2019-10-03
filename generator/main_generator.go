@@ -26,9 +26,9 @@ type (
 		Run(serviceName, protoPath string)
 	}
 	generator struct {
-		service   Service
-		client    Client
-		protoFile string
+		service     Service
+		client      Client
+		protoFile   string
 		serviceName string
 	}
 )
@@ -45,12 +45,12 @@ func (g generator) Run(serviceName string, protoPath string) {
 	fmt.Println("Creating ", serviceName)
 	fmt.Println(serviceName, "Scaffolding ...")
 	err := os.Mkdir(serviceName, os.ModePerm)
-	if err!=nil{
-		log.Fatal("folder "+serviceName+" already exist")
+	if err != nil {
+		log.Fatal("folder " + serviceName + " already exist")
 	}
 	err = os.Mkdir(serviceName+"/client", os.ModePerm)
-	if err!=nil{
-		g.rollbackWhenError("fail create client folder inside "+serviceName)
+	if err != nil {
+		g.rollbackWhenError("fail create client folder inside " + serviceName)
 	}
 
 	g.GetTemplates(serviceName)
@@ -58,7 +58,7 @@ func (g generator) Run(serviceName string, protoPath string) {
 
 	if protoPath != "" {
 		_, err := os.Stat(protoPath)
-		if  os.IsNotExist(err) {
+		if os.IsNotExist(err) {
 			g.rollbackWhenError("proto not exists or invalid path")
 		}
 		protoPath = strings.ReplaceAll(protoPath, "\n", "")
@@ -67,25 +67,25 @@ func (g generator) Run(serviceName string, protoPath string) {
 		fmt.Println("RPC Path : ", protoPath)
 		g.protoFile = protoPath
 		err = os.Mkdir(serviceName+"/"+g.getProtoFolder(protoPath), os.ModePerm)
-		if err!=nil{
-			g.rollbackWhenError("fail to create dir "+serviceName+"/"+g.getProtoFolder(protoPath))
+		if err != nil {
+			g.rollbackWhenError("fail to create dir " + serviceName + "/" + g.getProtoFolder(protoPath))
 		}
 		err = util.CopyFolder(g.getProtoFolder(protoPath)+"/", serviceName+"/"+protoPath+"/")
-		if err!=nil{
-			g.rollbackWhenError("fail to create dir "+g.getProtoFolder(protoPath)+"/"+serviceName+"/"+protoPath+"/")
+		if err != nil {
+			g.rollbackWhenError("fail to create dir " + g.getProtoFolder(protoPath) + "/" + serviceName + "/" + protoPath + "/")
 		}
 		g.client = NewRPCClientGenerator(g.protoFile, serviceName, serviceURL)
 		g.service = NewServiceGenerator(serviceName, serviceURL, g.protoFile)
 		fmt.Println(serviceName, "Generating client ...")
 		err = g.client.Generate()
-		if err!=nil{
-			g.rollbackWhenError("fail generate client "+err.Error())
+		if err != nil {
+			g.rollbackWhenError("fail generate client " + err.Error())
 		}
 		time.Sleep(1500 * time.Millisecond)
 		fmt.Println(serviceName, "Generating service&test ...")
-		err =g.service.Generate()
-		if err!=nil{
-			g.rollbackWhenError("fail generate service&test "+err.Error())
+		err = g.service.Generate()
+		if err != nil {
+			g.rollbackWhenError("fail generate service&test " + err.Error())
 		}
 		time.Sleep(1500 * time.Millisecond)
 	}
@@ -105,7 +105,7 @@ go mod tidy;
 `
 	bt := []byte(contents)
 	err := ioutil.WriteFile(scaffold, bt, 0644)
-	if err!=nil{
+	if err != nil {
 		g.rollbackWhenError("fail when create scaffold script")
 	}
 }
@@ -125,7 +125,7 @@ func (g generator) GetTemplates(serviceName string) {
 `
 	bt := []byte(contents)
 	err := ioutil.WriteFile(template, bt, 0644)
-	if err!=nil{
+	if err != nil {
 		g.rollbackWhenError("fail when create scaffold script")
 	}
 	defer func() {
@@ -133,7 +133,7 @@ func (g generator) GetTemplates(serviceName string) {
 	}()
 	cmd := exec.Command(bash, template, serviceName)
 	err = g.runCmd(cmd)
-	if err!=nil{
+	if err != nil {
 		log.Fatal("fail run scaffold script")
 	}
 
@@ -150,7 +150,7 @@ ls $pathpbgo | xargs -n1 -IX bash -c 'sed s/,omitempty// X > X.tmp && mv X{.tmp,
 `
 	bt := []byte(contents)
 	err := ioutil.WriteFile(proto2go, bt, 0644)
-	if err!=nil{
+	if err != nil {
 		g.rollbackWhenError("fail when run proto script")
 	}
 	defer func() {
@@ -161,7 +161,7 @@ ls $pathpbgo | xargs -n1 -IX bash -c 'sed s/,omitempty// X > X.tmp && mv X{.tmp,
 	path = strings.Join(pathArr, "/")
 	cmd := exec.Command(bash, proto2go, path)
 	err = g.runCmd(cmd)
-	if err!=nil{
+	if err != nil {
 		g.rollbackWhenError("fail when run proto script")
 	}
 }
@@ -173,7 +173,7 @@ func (g generator) RunScaffold(serviceName string) {
 		_ = os.Remove(scaffold)
 	}()
 	err := g.runCmd(cmd)
-	if err!=nil{
+	if err != nil {
 		g.rollbackWhenError("fail on scaffolding")
 	}
 }
@@ -196,7 +196,7 @@ func (g generator) getProtoFolder(path string) string {
 	return path
 }
 
-func(g generator) rollbackWhenError(message string){
+func (g generator) rollbackWhenError(message string) {
 	_ = os.RemoveAll(g.serviceName)
 	_ = os.Remove(scaffold)
 	_ = os.Remove(template)

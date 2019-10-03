@@ -45,7 +45,7 @@ func NewRPCClientGenerator(protoPath string, serviceName string, serviceRepo str
 func (c client) Generate() error {
 	f := jen.NewFile("client")
 	serviceObj, err := c.ParseProtoToArray(c.serviceName, c.protoPath)
-	if err!=nil{
+	if err != nil {
 		return err
 	}
 	f.ImportAlias(c.serviceURLProto, "pb")
@@ -83,14 +83,14 @@ func (c client) Generate() error {
 
 	buf := &bytes.Buffer{}
 	err = f.Render(buf)
-	if err!=nil{
+	if err != nil {
 		return err
 	}
 	splitPath := strings.Split(c.protoPath, "/")
 	savePath := splitPath[2]
 	savePath = strings.Replace(savePath, ".pb.go", ".go", -1)
 	err = ioutil.WriteFile(c.serviceName+"/"+"client"+"/"+savePath, buf.Bytes(), 0644)
-	if err!=nil{
+	if err != nil {
 		return err
 	}
 	return nil

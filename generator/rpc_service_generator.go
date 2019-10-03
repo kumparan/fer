@@ -39,7 +39,7 @@ func NewServiceGenerator(name string, url string, protoPath string) Service {
 //Generate generate service&test from proto
 func (s service) Generate() error {
 	var functions, err = s.CreateFunctionList()
-	if err!=nil{
+	if err != nil {
 		return err
 	}
 	for key, value := range functions {
@@ -72,20 +72,20 @@ func (s service) Generate() error {
 		buf := &bytes.Buffer{}
 		bufTest := &bytes.Buffer{}
 		err := f.Render(buf)
-		if err!=nil{
+		if err != nil {
 			return err
 		}
 		err = fTest.Render(bufTest)
-		if err!=nil{
+		if err != nil {
 			return err
 		}
 
 		err = ioutil.WriteFile(s.name+"/service/"+key+"_impl.go", buf.Bytes(), 0644)
-		if err!=nil{
+		if err != nil {
 			return err
 		}
 		err = ioutil.WriteFile(s.name+"/service/"+key+"_impl_test.go", bufTest.Bytes(), 0644)
-		if err!=nil{
+		if err != nil {
 			return err
 		}
 	}

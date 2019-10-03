@@ -21,11 +21,11 @@ example 'fer project --name example-service --proto pb/example/example.proto'
 func projectGenerator(cmd *cobra.Command, args []string) {
 	g := generator.NewGenerator()
 	name, err := cmd.Flags().GetString("name")
-	if err!=nil{
+	if err != nil {
 		log.Fatal("fail retreive --name flag")
 	}
 	proto, err := cmd.Flags().GetString("proto")
-	if err!=nil{
+	if err != nil {
 		log.Fatal("fail retreive --proto flag")
 	}
 	if name != "" {
