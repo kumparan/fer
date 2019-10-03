@@ -28,7 +28,8 @@ type (
 	generator struct {
 		service   Service
 		client    Client
-		protofile string
+		protoFile string
+		serviceName string
 	}
 )
 
@@ -39,34 +40,55 @@ func NewGenerator() Generator {
 
 //Generate to generate service
 func (g generator) Run(serviceName string, protoPath string) {
+	g.serviceName = serviceName
+	fmt.Println(">>> " + serviceName + " <<<")
 	fmt.Println("Creating ", serviceName)
 	fmt.Println(serviceName, "Scaffolding ...")
-	_ = os.RemoveAll(serviceName)
-	_ = os.Mkdir(serviceName, os.ModePerm)
-	_ = os.Mkdir(serviceName+"/client", os.ModePerm)
+	err := os.Mkdir(serviceName, os.ModePerm)
+	if err!=nil{
+		log.Fatal("folder "+serviceName+" already exist")
+	}
+	err = os.Mkdir(serviceName+"/client", os.ModePerm)
+	if err!=nil{
+		g.cleaningWhenError("fail create client folder inside "+serviceName)
+	}
 
 	g.GetTemplates(serviceName)
 	serviceURL := "gitlab.kumparan.com/yowez/" + serviceName
 
 	if protoPath != "" {
+		_, err := os.Stat(protoPath)
+		if  os.IsNotExist(err) {
+			g.cleaningWhenError("proto not exists or invalid path")
+		}
 		protoPath = strings.ReplaceAll(protoPath, "\n", "")
 		g.GenerateProto2Go(protoPath)
 		protoPath = strings.ReplaceAll(protoPath, "proto", "pb.go")
-		fmt.Println(">>> " + serviceName + " <<<")
 		fmt.Println("RPC Path : ", protoPath)
-		g.protofile = protoPath
-		_ = os.Mkdir(serviceName+"/"+g.getProtoFolder(protoPath), os.ModePerm)
-		_ = util.CopyFolder(g.getProtoFolder(protoPath)+"/", serviceName+"/"+protoPath+"/")
-		g.client = NewRPCClientGenerator(g.protofile, serviceName, serviceURL)
-		g.service = NewServiceGenerator(serviceName, serviceURL, g.protofile)
+		g.protoFile = protoPath
+		err = os.Mkdir(serviceName+"/"+g.getProtoFolder(protoPath), os.ModePerm)
+		if err!=nil{
+			g.cleaningWhenError("fail to create dir "+serviceName+"/"+g.getProtoFolder(protoPath))
+		}
+		err = util.CopyFolder(g.getProtoFolder(protoPath)+"/", serviceName+"/"+protoPath+"/")
+		if err!=nil{
+			g.cleaningWhenError("fail to create dir "+g.getProtoFolder(protoPath)+"/"+serviceName+"/"+protoPath+"/")
+		}
+		g.client = NewRPCClientGenerator(g.protoFile, serviceName, serviceURL)
+		g.service = NewServiceGenerator(serviceName, serviceURL, g.protoFile)
 		fmt.Println(serviceName, "Generating client ...")
-		g.client.Generate()
+		err = g.client.Generate()
+		if err!=nil{
+			g.cleaningWhenError("fail generate client "+err.Error())
+		}
 		time.Sleep(1500 * time.Millisecond)
 		fmt.Println(serviceName, "Generating service&test ...")
-		g.service.Generate()
+		err =g.service.Generate()
+		if err!=nil{
+			g.cleaningWhenError("fail generate service&test "+err.Error())
+		}
 		time.Sleep(1500 * time.Millisecond)
 	}
-
 	g.CreateScaffoldScript()
 	g.RunScaffold(serviceName)
 	fmt.Println(serviceName, "Created")
@@ -80,11 +102,12 @@ find $servicename -type f -exec sed -i '' "s/skeleton-service/$servicename/g" {}
 cp $servicename/*.example $servicename/config.yml;
 cd $servicename;
 go mod tidy;
-go get;
 `
 	bt := []byte(contents)
-	_ = ioutil.WriteFile("scaffold.sh", bt, 0644)
-
+	err := ioutil.WriteFile(scaffold, bt, 0644)
+	if err!=nil{
+		g.cleaningWhenError("fail when create scaffold script")
+	}
 }
 
 //GetTemplates to get service template
@@ -101,12 +124,18 @@ func (g generator) GetTemplates(serviceName string) {
 	cd ..;
 `
 	bt := []byte(contents)
-	_ = ioutil.WriteFile(template, bt, 0644)
+	err := ioutil.WriteFile(template, bt, 0644)
+	if err!=nil{
+		g.cleaningWhenError("fail when create scaffold script")
+	}
 	defer func() {
 		_ = os.Remove(template)
 	}()
 	cmd := exec.Command(bash, template, serviceName)
-	g.runCmd(cmd)
+	err = g.runCmd(cmd)
+	if err!=nil{
+		log.Fatal("fail run scaffold script")
+	}
 
 }
 
@@ -116,13 +145,14 @@ func (g generator) GenerateProto2Go(path string) {
 path=$1;	
 pathproto="${path}/*.proto";
 pathpbgo="${path}/*.pb.go";
-echo $pathproto;
-echo $pathpbgo;
 protoc --go_out=plugins=grpc:. $pathproto;
 ls $pathpbgo | xargs -n1 -IX bash -c 'sed s/,omitempty// X > X.tmp && mv X{.tmp,}';
 `
 	bt := []byte(contents)
-	_ = ioutil.WriteFile(proto2go, bt, 0644)
+	err := ioutil.WriteFile(proto2go, bt, 0644)
+	if err!=nil{
+		g.cleaningWhenError("fail when run proto script")
+	}
 	defer func() {
 		_ = os.Remove(proto2go)
 	}()
@@ -130,7 +160,10 @@ ls $pathpbgo | xargs -n1 -IX bash -c 'sed s/,omitempty// X > X.tmp && mv X{.tmp,
 	pathArr = pathArr[:len(pathArr)-1]
 	path = strings.Join(pathArr, "/")
 	cmd := exec.Command(bash, proto2go, path)
-	g.runCmd(cmd)
+	err = g.runCmd(cmd)
+	if err!=nil{
+		g.cleaningWhenError("fail when run proto script")
+	}
 }
 
 //RunScaffold to run scaffold script
@@ -139,17 +172,21 @@ func (g generator) RunScaffold(serviceName string) {
 	defer func() {
 		_ = os.Remove(scaffold)
 	}()
-	g.runCmd(cmd)
+	err := g.runCmd(cmd)
+	if err!=nil{
+		g.cleaningWhenError("fail on scaffolding")
+	}
 }
 
-func (g generator) runCmd(cmd *exec.Cmd) {
+func (g generator) runCmd(cmd *exec.Cmd) error {
 	var outb, errb bytes.Buffer
 	cmd.Stdout = &outb
 	cmd.Stderr = &errb
 	err := cmd.Run()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
+	return nil
 }
 
 func (g generator) getProtoFolder(path string) string {
@@ -157,4 +194,12 @@ func (g generator) getProtoFolder(path string) string {
 	pathArr = pathArr[:len(pathArr)-1]
 	path = strings.Join(pathArr, "/")
 	return path
+}
+
+func(g generator) cleaningWhenError(message string){
+	_ = os.RemoveAll(g.serviceName)
+	_ = os.Remove(scaffold)
+	_ = os.Remove(template)
+	_ = os.Remove(proto2go)
+	log.Fatal(message)
 }

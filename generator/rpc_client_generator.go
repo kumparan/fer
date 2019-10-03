@@ -20,7 +20,7 @@ type Function struct {
 type (
 	//Client define client
 	Client interface {
-		Generate()
+		Generate() error
 	}
 	client struct {
 		protoPath         string
@@ -42,27 +42,30 @@ func NewRPCClientGenerator(protoPath string, serviceName string, serviceRepo str
 }
 
 //Generate ...
-func (c client) Generate() {
+func (c client) Generate() error {
 	f := jen.NewFile("client")
-	serviceObj, _ := c.ParseProtoToArray(c.serviceName, c.protoPath)
+	serviceObj, err := c.ParseProtoToArray(c.serviceName, c.protoPath)
+	if err!=nil{
+		return err
+	}
 	f.ImportAlias(c.serviceURLProto, "pb")
 	for _, v := range serviceObj {
 		var returns string
 		var bodyReturn string
 		parameters := "(" + strings.Join(v.Parameters, ",") + ")"
 
-		for _, aReturn := range v.Returns {
-			returns = returns + "," + aReturn
+		for _, itemReturn := range v.Returns {
+			returns = returns + "," + itemReturn
 		}
-		for _, aReturn := range v.Returns {
-			if strings.Contains(aReturn, "*") {
-				aReturn = strings.Replace(aReturn, "*", "&", -1)
-				aReturn += "{}"
+		for _, itemReturn := range v.Returns {
+			if strings.Contains(itemReturn, "*") {
+				itemReturn = strings.Replace(itemReturn, "*", "&", -1)
+				itemReturn += "{}"
 			}
-			if strings.Contains(aReturn, "error") {
-				aReturn = strings.Replace(aReturn, "error", "nil", -1)
+			if strings.Contains(itemReturn, "error") {
+				itemReturn = strings.Replace(itemReturn, "error", "nil", -1)
 			}
-			bodyReturn = bodyReturn + "," + aReturn
+			bodyReturn = bodyReturn + "," + itemReturn
 
 		}
 		returns = returns[1:]
@@ -79,12 +82,18 @@ func (c client) Generate() {
 	}
 
 	buf := &bytes.Buffer{}
-	_ = f.Render(buf)
+	err = f.Render(buf)
+	if err!=nil{
+		return err
+	}
 	splitPath := strings.Split(c.protoPath, "/")
 	savePath := splitPath[2]
 	savePath = strings.Replace(savePath, ".pb.go", ".go", -1)
-	_ = ioutil.WriteFile(c.serviceName+"/"+"client"+"/"+savePath, buf.Bytes(), 0644)
-
+	err = ioutil.WriteFile(c.serviceName+"/"+"client"+"/"+savePath, buf.Bytes(), 0644)
+	if err!=nil{
+		return err
+	}
+	return nil
 }
 
 //CreateFunctionArgsClient :nodoc:

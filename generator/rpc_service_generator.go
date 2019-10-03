@@ -4,11 +4,10 @@ import (
 	"bufio"
 	"bytes"
 	"io/ioutil"
-
 	"os"
 	"strings"
 
-	jen "github.com/dave/jennifer/jen" //Code generator
+	"github.com/dave/jennifer/jen" //Code generator
 )
 
 const (
@@ -18,7 +17,7 @@ const (
 type (
 	//Service define service
 	Service interface {
-		Generate()
+		Generate() error
 	}
 	service struct {
 		name                string
@@ -38,8 +37,11 @@ func NewServiceGenerator(name string, url string, protoPath string) Service {
 }
 
 //Generate generate service&test from proto
-func (s service) Generate() {
-	var functions = s.CreateFunctionList()
+func (s service) Generate() error {
+	var functions, err = s.CreateFunctionList()
+	if err!=nil{
+		return err
+	}
 	for key, value := range functions {
 		f := jen.NewFile(packageName)
 		fTest := jen.NewFile(packageName)
@@ -69,21 +71,33 @@ func (s service) Generate() {
 
 		buf := &bytes.Buffer{}
 		bufTest := &bytes.Buffer{}
-		_ = f.Render(buf)
-		_ = fTest.Render(bufTest)
+		err := f.Render(buf)
+		if err!=nil{
+			return err
+		}
+		err = fTest.Render(bufTest)
+		if err!=nil{
+			return err
+		}
 
-		_ = ioutil.WriteFile(s.name+"/service/"+key+"_impl.go", buf.Bytes(), 0644)
-		_ = ioutil.WriteFile(s.name+"/service/"+key+"_impl_test.go", bufTest.Bytes(), 0644)
-
+		err = ioutil.WriteFile(s.name+"/service/"+key+"_impl.go", buf.Bytes(), 0644)
+		if err!=nil{
+			return err
+		}
+		err = ioutil.WriteFile(s.name+"/service/"+key+"_impl_test.go", bufTest.Bytes(), 0644)
+		if err!=nil{
+			return err
+		}
 	}
+	return nil
 }
 
 //CreateFunctionList to create function list
-func (s service) CreateFunctionList() (functions map[string]string) {
+func (s service) CreateFunctionList() (functions map[string]string, err error) {
 	functions = make(map[string]string)
 	f, err := os.Open(s.protoPath)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
 	scan := bufio.NewScanner(f)
 	flagPrint := false
@@ -144,8 +158,8 @@ func (s service) CreateFunctionParameters(in string) (parameters []jen.Code) {
 			if strings.Contains(paramPath, "pb") {
 				paramPath = s.serviceURLProtoPath
 			}
-			argType := strings.Split(paramItem[1], ".")[1]
-			parameters = append(parameters, jen.Code(jen.Id(paramName).Op("*").Qual(paramPath, argType)))
+			paramType := strings.Split(paramItem[1], ".")[1]
+			parameters = append(parameters, jen.Code(jen.Id(paramName).Op("*").Qual(paramPath, paramType)))
 		}
 	}
 	return
