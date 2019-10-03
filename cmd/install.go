@@ -36,13 +36,13 @@ func installAll() {
 func init() {
 	installCmd.AddCommand(goUtilsCmd)
 	installCmd.AddCommand(watchmedoCmd)
-	RootCmd.AddCommand(installCmd)
+	rootCmd.AddCommand(installCmd)
 }
 
 var goUtilsCmd = &cobra.Command{
 	Use:   "goutils",
 	Short: "fer install goutils",
-	Long:  "This subcommand to install git go utils like ",
+	Long:  "This subcommand to install git go utils ",
 	Run:   installGoUtilsCmd,
 }
 
