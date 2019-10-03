@@ -12,16 +12,6 @@ import (
 	version "github.com/hashicorp/go-version"
 )
 
-// type (
-// 	// Helper :nodoc:
-// 	Helper interface {
-// 		CheckExistenceOfGolang()
-// 		CheckGolangVersion()
-// 		CheckExistenceOfChangelog()
-// 		CheckChangelogVersion()
-// 	}
-// )
-
 // CheckExistenceOfGolang :nodoc:
 func CheckExistenceOfGolang() {
 	cmdGetGolangLocation := exec.Command("which", "go")
@@ -43,37 +33,17 @@ func CheckGolangVersion() {
 	v1, _ := version.NewVersion(config.GoVersion)
 	v2, _ := version.NewVersion(regexVersion.FindString(goLocalversion))
 	if v2.LessThan(v1) {
-		fmt.Println("Go version must be 1.12.7 or latest")
+		fmt.Printf("Go version must be %s or latest\n", config.GoVersion)
 		os.Exit(1)
 	}
 }
 
-// CheckExistenceOfChangelog :nodoc:
-func CheckExistenceOfChangelog() {
-	cmdGetChglogLocation := exec.Command("which", "git-chglog")
-	err := cmdGetChglogLocation.Run()
+// CheckedInstallerPath :nodoc:
+func CheckedInstallerPath(installer string) string {
+	cmdGetInstallerPath := exec.Command("which", installer)
+	err := cmdGetInstallerPath.Run()
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return "fail installed " + installer
 	}
-}
-
-// CheckExistenceOfMake :nodoc:
-func CheckExistenceOfMake() {
-	cmdGetChglogLocation := exec.Command("which", "make")
-	err := cmdGetChglogLocation.Run()
-	if err != nil {
-		fmt.Println("You need install make")
-		os.Exit(1)
-	}
-}
-
-// CheckChangelogVersion :nodoc:
-func CheckChangelogVersion() {
-	cmdGetChglogVersion, err := exec.Command("git-chglog", "--version").Output()
-	if err != nil {
-		log.Fatal(err)
-	}
-	var goLocalversion = string(cmdGetChglogVersion)
-	fmt.Println(goLocalversion)
+	return "Success installed " + installer
 }

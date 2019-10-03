@@ -1,6 +1,9 @@
 package cmd
 
 import (
+	"fmt"
+
+	"github.com/kumparan/fer/config"
 	"github.com/kumparan/fer/installer"
 	"github.com/spf13/cobra"
 )
@@ -19,15 +22,15 @@ func installAllCmd(_ *cobra.Command, _ []string) {
 func installAll() {
 	installer.CheckExistenceOfGolang()
 	installer.CheckGolangVersion()
-	installer.InstallProtobuf()
-	installer.InstallMockgen()
-	installer.InstallRichgo()
-	installer.InstallGoLint()
-	installer.InstallChangelog()
-	installer.CheckExistenceOfChangelog()
-	installer.CheckChangelogVersion()
-	installer.CheckExistenceOfMake()
-	installer.InstallWatchmedo()
+	message := installer.InstallGoUtils("protoc-gen-go", config.ProtobufInstallerURL)
+	message = installer.InstallGoUtils("mockgen", config.MockgenInstallerURL)
+	message = installer.InstallGoUtils("richgo", config.RichgoInstallerURL)
+	message = installer.InstallGoUtils("golint", config.GolintInstallerURL)
+	message = installer.InstallGoUtils("git-chglog", config.ChangeLogInstallerURL)
+	message = installer.CheckedInstallerPath("make")
+	message = installer.InstallWatchmedo()
+	fmt.Printf("%+v", message)
+
 }
 
 func init() {
@@ -50,14 +53,13 @@ func installGoUtilsCmd(_ *cobra.Command, _ []string) {
 func installGoUtils() {
 	installer.CheckExistenceOfGolang()
 	installer.CheckGolangVersion()
-	installer.InstallProtobuf()
-	installer.InstallMockgen()
-	installer.InstallRichgo()
-	installer.InstallGoLint()
-	installer.InstallChangelog()
-	installer.CheckExistenceOfChangelog()
-	installer.CheckChangelogVersion()
-	installer.CheckExistenceOfMake()
+	message := installer.InstallGoUtils("protoc-gen-go", config.ProtobufInstallerURL)
+	message = installer.InstallGoUtils("mockgen", config.MockgenInstallerURL)
+	message = installer.InstallGoUtils("richgo", config.RichgoInstallerURL)
+	message = installer.InstallGoUtils("golint", config.GolintInstallerURL)
+	message = installer.InstallGoUtils("git-chglog", config.ChangeLogInstallerURL)
+	message = installer.CheckedInstallerPath("make")
+	fmt.Printf("%+v", message)
 }
 
 var watchmedoCmd = &cobra.Command{
@@ -72,5 +74,6 @@ func installWatchmedoCmd(cmd *cobra.Command, args []string) {
 }
 
 func installWatchmedo() {
-	installer.InstallWatchmedo()
+	message := installer.InstallWatchmedo()
+	fmt.Println(message)
 }
