@@ -1,19 +1,10 @@
-package cmd
+package console
 
 import (
-<<<<<<< HEAD
-<<<<<<< HEAD
 	"fmt"
 	"strings"
 
 	"github.com/kumparan/fer/config"
-=======
->>>>>>> feature: add all need Contributing to Backend Projects
-=======
-	"fmt"
-
-	"github.com/kumparan/fer/config"
->>>>>>> feature: add all need Contributing to Backend Projects
 	"github.com/kumparan/fer/installer"
 	"github.com/spf13/cobra"
 )
@@ -32,7 +23,6 @@ func installAllCmd(_ *cobra.Command, _ []string) {
 func installAll() {
 	installer.CheckExistenceOfGolang()
 	installer.CheckGolangVersion()
-<<<<<<< HEAD
 	var messages = []string{}
 
 	message := installer.InstallGoUtils("protoc-gen-go", config.ProtobufInstallerURL)
@@ -59,23 +49,12 @@ func installAll() {
 	message = installer.ProtobufInstaller()
 	messages = append(messages, message)
 	fmt.Printf("%s", strings.Join(messages, "/n"))
-=======
-	message := installer.InstallGoUtils("protoc-gen-go", config.ProtobufInstallerURL)
-	message = installer.InstallGoUtils("mockgen", config.MockgenInstallerURL)
-	message = installer.InstallGoUtils("richgo", config.RichgoInstallerURL)
-	message = installer.InstallGoUtils("golint", config.GolintInstallerURL)
-	message = installer.InstallGoUtils("git-chglog", config.ChangeLogInstallerURL)
-	message = installer.CheckedInstallerPath("make")
-	message = installer.InstallWatchmedo()
-	fmt.Printf("%+v", message)
->>>>>>> feature: add all need Contributing to Backend Projects
 
 }
 
 func init() {
 	installCmd.AddCommand(goUtilsCmd)
 	installCmd.AddCommand(watchmedoCmd)
-<<<<<<< HEAD
 	installCmd.AddCommand(protobufCmd)
 	rootCmd.AddCommand(installCmd)
 }
@@ -146,50 +125,4 @@ func installProtobufCmd(cmd *cobra.Command, args []string) {
 func installProtobuf() {
 	message := installer.ProtobufInstaller()
 	fmt.Println(message)
-=======
-	RootCmd.AddCommand(installCmd)
-}
-
-var goUtilsCmd = &cobra.Command{
-	Use:   "goutils",
-	Short: "fer install goutils",
-	Long:  "This subcommand to install git go utils like ",
-	Run:   installGoUtilsCmd,
-}
-
-func installGoUtilsCmd(_ *cobra.Command, _ []string) {
-	installGoUtils()
-}
-
-func installGoUtils() {
-	installer.CheckExistenceOfGolang()
-	installer.CheckGolangVersion()
-	message := installer.InstallGoUtils("protoc-gen-go", config.ProtobufInstallerURL)
-	message = installer.InstallGoUtils("mockgen", config.MockgenInstallerURL)
-	message = installer.InstallGoUtils("richgo", config.RichgoInstallerURL)
-	message = installer.InstallGoUtils("golint", config.GolintInstallerURL)
-	message = installer.InstallGoUtils("git-chglog", config.ChangeLogInstallerURL)
-	message = installer.CheckedInstallerPath("make")
-	fmt.Printf("%+v", message)
-}
-
-var watchmedoCmd = &cobra.Command{
-	Use:   "watchmedo",
-	Short: "fer install watchmedo",
-	Long:  "This subcommand to install watchmedo",
-	Run:   installWatchmedoCmd,
-}
-
-func installWatchmedoCmd(cmd *cobra.Command, args []string) {
-	installWatchmedo()
-}
-
-func installWatchmedo() {
-<<<<<<< HEAD
-	installer.InstallWatchmedo()
->>>>>>> feature: add all need Contributing to Backend Projects
-=======
-	message := installer.InstallWatchmedo()
-	fmt.Println(message)
->>>>>>> feature: add all need Contributing to Backend Projects
 }
