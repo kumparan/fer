@@ -2,9 +2,7 @@ package installer
 
 import (
 	"fmt"
-	"io"
 	"log"
-	"net/http"
 	"os"
 	"os/exec"
 	"regexp"
@@ -13,6 +11,16 @@ import (
 
 	version "github.com/hashicorp/go-version"
 )
+
+// type (
+// 	// Helper :nodoc:
+// 	Helper interface {
+// 		CheckExistenceOfGolang()
+// 		CheckGolangVersion()
+// 		CheckExistenceOfChangelog()
+// 		CheckChangelogVersion()
+// 	}
+// )
 
 // CheckExistenceOfGolang :nodoc:
 func CheckExistenceOfGolang() {
@@ -31,43 +39,41 @@ func CheckGolangVersion() {
 		log.Fatal(err)
 	}
 	var goLocalversion = string(cmdGetGolangVersion)
-	var regexVersion, _ = regexp.Compile(`(\d+\.\d+\.\d+)`)
+	var regexVersion, _ = regexp.Compile(`(\d\.\d+\.\d)`)
 	v1, _ := version.NewVersion(config.GoVersion)
 	v2, _ := version.NewVersion(regexVersion.FindString(goLocalversion))
 	if v2.LessThan(v1) {
-		fmt.Printf("Go version must be %s or latest\n", config.GoVersion)
+		fmt.Println("Go version must be 1.12.7 or latest")
 		os.Exit(1)
 	}
 }
 
-// CheckedInstallerPath :nodoc:
-func CheckedInstallerPath(installer string) string {
-	cmdGetInstallerPath := exec.Command("which", installer)
-	err := cmdGetInstallerPath.Run()
+// CheckExistenceOfChangelog :nodoc:
+func CheckExistenceOfChangelog() {
+	cmdGetChglogLocation := exec.Command("which", "git-chglog")
+	err := cmdGetChglogLocation.Run()
 	if err != nil {
-		return "fail installed " + installer
+		fmt.Println(err)
+		os.Exit(1)
 	}
-	return "Success installed " + installer
 }
 
-// DownloadFile :nodoc:
-func DownloadFile(filepath string, url string) error {
-
-	// Get the data
-	resp, err := http.Get(url)
+// CheckExistenceOfMake :nodoc:
+func CheckExistenceOfMake() {
+	cmdGetChglogLocation := exec.Command("which", "make")
+	err := cmdGetChglogLocation.Run()
 	if err != nil {
-		return err
+		fmt.Println("You need install make")
+		os.Exit(1)
 	}
-	defer resp.Body.Close()
+}
 
-	// Create the file
-	out, err := os.Create(filepath)
+// CheckChangelogVersion :nodoc:
+func CheckChangelogVersion() {
+	cmdGetChglogVersion, err := exec.Command("git-chglog", "--version").Output()
 	if err != nil {
-		return err
+		log.Fatal(err)
 	}
-	defer out.Close()
-
-	// Write the body to file
-	_, err = io.Copy(out, resp.Body)
-	return err
+	var goLocalversion = string(cmdGetChglogVersion)
+	fmt.Println(goLocalversion)
 }

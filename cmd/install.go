@@ -1,10 +1,13 @@
 package cmd
 
 import (
+<<<<<<< HEAD
 	"fmt"
 	"strings"
 
 	"github.com/kumparan/fer/config"
+=======
+>>>>>>> feature: add all need Contributing to Backend Projects
 	"github.com/kumparan/fer/installer"
 	"github.com/spf13/cobra"
 )
@@ -55,6 +58,7 @@ func installAll() {
 func init() {
 	installCmd.AddCommand(goUtilsCmd)
 	installCmd.AddCommand(watchmedoCmd)
+<<<<<<< HEAD
 	installCmd.AddCommand(protobufCmd)
 	rootCmd.AddCommand(installCmd)
 }
@@ -125,4 +129,46 @@ func installProtobufCmd(cmd *cobra.Command, args []string) {
 func installProtobuf() {
 	message := installer.ProtobufInstaller()
 	fmt.Println(message)
+=======
+	RootCmd.AddCommand(installCmd)
+}
+
+var goUtilsCmd = &cobra.Command{
+	Use:   "goutils",
+	Short: "fer install goutils",
+	Long:  "This subcommand to install git go utils like ",
+	Run:   installGoUtilsCmd,
+}
+
+func installGoUtilsCmd(_ *cobra.Command, _ []string) {
+	installGoUtils()
+}
+
+func installGoUtils() {
+	installer.CheckExistenceOfGolang()
+	installer.CheckGolangVersion()
+	installer.InstallProtobuf()
+	installer.InstallMockgen()
+	installer.InstallRichgo()
+	installer.InstallGoLint()
+	installer.InstallChangelog()
+	installer.CheckExistenceOfChangelog()
+	installer.CheckChangelogVersion()
+	installer.CheckExistenceOfMake()
+}
+
+var watchmedoCmd = &cobra.Command{
+	Use:   "watchmedo",
+	Short: "fer install watchmedo",
+	Long:  "This subcommand to install watchmedo",
+	Run:   installWatchmedoCmd,
+}
+
+func installWatchmedoCmd(cmd *cobra.Command, args []string) {
+	installWatchmedo()
+}
+
+func installWatchmedo() {
+	installer.InstallWatchmedo()
+>>>>>>> feature: add all need Contributing to Backend Projects
 }
