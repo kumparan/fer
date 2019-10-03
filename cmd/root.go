@@ -8,16 +8,24 @@ import (
 )
 
 // RootCmd represents the base command when called without any subcommands
-var RootCmd = &cobra.Command{
-	Use:   "cobra-example",
-	Short: "An example of cobra",
-	Long: `This application shows how to create modern CLI
-			applications in go using Cobra CLI library`,
+var rootCmd = &cobra.Command{
+	Use:   "fer",
+	Short: "fer",
+	Long: `
+    ________________ 
+   / ____/ ____/ __ \
+  / /_  / __/ / /_/ /
+ / __/ / /___/ _, _/ 
+/_/   /_____/_/ |_|  
+fer is not ferdian.
+fer is development tool for backend engineer.
+fer can help whatever you want.
+`,
 }
 
 // Execute :nodoc:
 func Execute() {
-	if err := RootCmd.Execute(); err != nil {
+	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
