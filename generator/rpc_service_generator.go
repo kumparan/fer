@@ -19,9 +19,6 @@ type (
 	//Service define service
 	Service interface {
 		Generate()
-		CreateFunctionList() map[string]string
-		CreateFunctionName(in string) string
-		CreateTestFunctionName(in string) string
 	}
 	service struct {
 		name                string
@@ -60,7 +57,7 @@ func (s service) Generate() {
 				f.Comment(s.CreateFunctionName(fun) + " :nodoc:")
 				f.Func().Params(
 					jen.Id("s").Id("Service"),
-				).Id(s.CreateFunctionName(fun)).Params(s.CreateFunctionArgs(fun)...).
+				).Id(s.CreateFunctionName(fun)).Params(s.CreateFunctionParameters(fun)...).
 					Parens(jen.List(jen.Id("res").Op("*").Qual(s.serviceURLProtoPath, s.CreateFunctionReturns(fun)[1]),
 						jen.Id("err").Error())).
 					Block(jen.Return())
@@ -69,6 +66,7 @@ func (s service) Generate() {
 				fTest.Func().Id(s.CreateTestFunctionName(fun)).Params(jen.Id("t").Op("*").Qual("testing", "T")).Block()
 			}
 		}
+
 		buf := &bytes.Buffer{}
 		bufTest := &bytes.Buffer{}
 		_ = f.Render(buf)
@@ -131,41 +129,55 @@ func (s service) CreateTestFunctionName(in string) (funcName string) {
 	return
 }
 
-//CreateFunctionArgs to create function args
-func (s service) CreateFunctionArgs(in string) (args []jen.Code) {
-	strlong := splitBetweenTwoChar(in, "(", ")")
-	strs := strings.Split(strlong, ", ")
-	strs = strs[1 : len(strs)-1]
+//CreateFunctionParameters to create function parameters
+func (s service) CreateFunctionParameters(in string) (parameters []jen.Code) {
+	param := splitBetweenTwoChar(in, "(", ")") //get all parameter
+	params := strings.Split(param, ", ")       //split each parameter
+	params = params[1 : len(params)-1]         //remove grpc option
 
-	args = append(args, jen.Code(jen.Id("ctx").Qual("context", "Context")))
-	for _, v := range strs {
+	parameters = append(parameters, jen.Code(jen.Id("ctx").Qual("context", "Context")))
+	for _, v := range params {
 		if strings.Contains(v, ".") {
-			argItem := strings.Split(v, " ")
-			argName := argItem[0]
-			argPath := strings.Split(argItem[1], ".")[0]
-			if strings.Contains(argPath, "pb") {
-				argPath = s.serviceURLProtoPath
+			paramItem := strings.Split(v, " ")
+			paramName := paramItem[0]
+			paramPath := strings.Split(paramItem[1], ".")[0]
+			if strings.Contains(paramPath, "pb") {
+				paramPath = s.serviceURLProtoPath
 			}
-			argType := strings.Split(argItem[1], ".")[1]
-			args = append(args, jen.Code(jen.Id(argName).Op("*").Qual(argPath, argType)))
+			argType := strings.Split(paramItem[1], ".")[1]
+			parameters = append(parameters, jen.Code(jen.Id(paramName).Op("*").Qual(paramPath, argType)))
 		}
 	}
 	return
 }
 
 //CreateFunctionReturns to create function returns
-func (s service) CreateFunctionReturns(in string) (r []string) {
-	strlong := strings.Split(in, "(")[2]
-	strlong = strings.ReplaceAll(strlong, ")", "")
-	strs := strings.Split(strlong, ", ")
-	for _, v := range strs {
+func (s service) CreateFunctionReturns(in string) (returns []string) {
+	ret := strings.Split(in, "(")[2] //get all return
+	ret = strings.ReplaceAll(ret, ")", "")
+	retSlice := strings.Split(ret, ", ")
+	for _, v := range retSlice {
 		if strings.Contains(v, ".") {
 			v = strings.ReplaceAll(v, "*", "")
 			v = strings.ReplaceAll(v, ")", "")
 			item := strings.Split(v, ".")
-			r = append(r, item[0])
-			r = append(r, item[1])
+			returns = append(returns, item[0])
+			returns = append(returns, item[1])
 		}
 	}
 	return
+}
+
+func splitBetweenTwoChar(str, before, after string) string {
+	a := strings.SplitAfterN(str, before, 2)
+	b := strings.SplitAfterN(a[len(a)-1], after, 2)
+	if 1 == len(b) {
+		return b[0]
+	}
+	return b[0][0 : len(b[0])-len(after)]
+}
+
+func createSimpleNameFromProtoPath(str string) string {
+	n := len(strings.Split(str, "/"))
+	return strings.Split(str, "/")[n-2]
 }

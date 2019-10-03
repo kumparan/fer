@@ -17,7 +17,9 @@ var rootCmd = &cobra.Command{
   / /_  / __/ / /_/ /
  / __/ / /___/ _, _/ 
 /_/   /_____/_/ |_|  
-fer is not ferdian
+fer is not ferdian.
+fer is development tool for backend engineer.
+fer can help whatever you want.
 `,
 }
 

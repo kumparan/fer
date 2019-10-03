@@ -1,10 +1,11 @@
 package generator
 
 import (
+	"bytes"
 	"fmt"
-	"io/ioutil"
-
 	"github.com/kumparan/fer/util"
+	"io/ioutil"
+	"log"
 
 	"os"
 	"os/exec"
@@ -25,8 +26,9 @@ type (
 		Run(serviceName, protoPath string)
 	}
 	generator struct {
-		service Service
-		client  Client
+		service   Service
+		client    Client
+		protofile string
 	}
 )
 
@@ -37,43 +39,41 @@ func NewGenerator() Generator {
 
 //Generate to generate service
 func (g generator) Run(serviceName string, protoPath string) {
-	protoPath = strings.ReplaceAll(protoPath, "\n", "")
-	GenerateProto2Go(protoPath)
-	protoPath = strings.ReplaceAll(protoPath, "proto", "pb.go")
-	fmt.Println(">>> " + serviceName + " <<<")
-	fmt.Println("RPC Path : ", protoPath)
-	protoCoreFile := protoPath
-	serviceURL := "gitlab.kumparan.com/yowez/" + serviceName
-
 	fmt.Println("Creating ", serviceName)
-
+	fmt.Println(serviceName, "Scaffolding ...")
 	_ = os.RemoveAll(serviceName)
 	_ = os.Mkdir(serviceName, os.ModePerm)
-	GetTemplates(serviceName)
-	_ = os.Mkdir(serviceName+"/service", os.ModePerm)
-	_ = os.Mkdir(serviceName+"/pb", os.ModePerm)
-	_ = os.Mkdir(serviceName+"/pb/example", os.ModePerm)
-
-	_ = util.CopyFolder("pb/example/", serviceName+"/pb/example/")
-
 	_ = os.Mkdir(serviceName+"/client", os.ModePerm)
-	CreateScaffoldScript()
-	fmt.Println(serviceName, "Scaffolding ...")
-	RunScaffold(serviceName)
-	g.client = NewRPCClientGenerator(protoCoreFile, serviceName, serviceURL)
-	g.service = NewServiceGenerator(serviceName, serviceURL, protoCoreFile)
-	fmt.Println(serviceName, "Generating client ...")
-	g.client.Generate()
-	time.Sleep(1500 * time.Millisecond)
-	fmt.Println(serviceName, "Generating service&test ...")
-	g.service.Generate()
-	time.Sleep(1500 * time.Millisecond)
-	fmt.Println(serviceName, "Created")
 
+	g.GetTemplates(serviceName)
+	serviceURL := "gitlab.kumparan.com/yowez/" + serviceName
+
+	if protoPath != "" {
+		protoPath = strings.ReplaceAll(protoPath, "\n", "")
+		g.GenerateProto2Go(protoPath)
+		protoPath = strings.ReplaceAll(protoPath, "proto", "pb.go")
+		fmt.Println(">>> " + serviceName + " <<<")
+		fmt.Println("RPC Path : ", protoPath)
+		g.protofile = protoPath
+		_ = os.Mkdir(serviceName+"/"+g.getProtoFolder(protoPath), os.ModePerm)
+		_ = util.CopyFolder(g.getProtoFolder(protoPath)+"/", serviceName+"/"+protoPath+"/")
+		g.client = NewRPCClientGenerator(g.protofile, serviceName, serviceURL)
+		g.service = NewServiceGenerator(serviceName, serviceURL, g.protofile)
+		fmt.Println(serviceName, "Generating client ...")
+		g.client.Generate()
+		time.Sleep(1500 * time.Millisecond)
+		fmt.Println(serviceName, "Generating service&test ...")
+		g.service.Generate()
+		time.Sleep(1500 * time.Millisecond)
+	}
+
+	g.CreateScaffoldScript()
+	g.RunScaffold(serviceName)
+	fmt.Println(serviceName, "Created")
 }
 
 //CreateScaffoldScript to create bash script for scaffolding
-func CreateScaffoldScript() {
+func (g generator) CreateScaffoldScript() {
 	contents := `#!/usr/bin/env bash
 servicename=$1;
 find $servicename -type f -exec sed -i '' "s/skeleton-service/$servicename/g" {} \;
@@ -82,41 +82,44 @@ cd $servicename;
 go mod tidy;
 go get;
 `
-
 	bt := []byte(contents)
 	_ = ioutil.WriteFile("scaffold.sh", bt, 0644)
 
 }
 
 //GetTemplates to get service template
-func GetTemplates(serviceName string) {
+func (g generator) GetTemplates(serviceName string) {
 	contents := `#!/usr/bin/env bash
 	servicename=$1;
 	cd $servicename;
 	git init;
 	git remote add origin git@gitlab.kumparan.com:yowez/skeleton-service.git;
 	git remote -v;
+	git fetch;	
 	git pull origin master;
 	rm -rf .git;
 	cd ..;
-
 `
 	bt := []byte(contents)
 	_ = ioutil.WriteFile(template, bt, 0644)
 	defer func() {
 		_ = os.Remove(template)
 	}()
-	exec.Command(bash, template, serviceName)
+	cmd := exec.Command(bash, template, serviceName)
+	g.runCmd(cmd)
 
 }
 
 //GenerateProto2Go :nodoc:
-func GenerateProto2Go(path string) {
+func (g generator) GenerateProto2Go(path string) {
 	contents := `#!/usr/bin/env bash
-	path=$1;
-	path="${1}/*.proto";
-	protoc --go_out=plugins=grpc:. $path;
-	ls pb/example/*.pb.go | xargs -n1 -IX bash -c 'sed s/,omitempty// X > X.tmp && mv X{.tmp,}';
+path=$1;	
+pathproto="${path}/*.proto";
+pathpbgo="${path}/*.pb.go";
+echo $pathproto;
+echo $pathpbgo;
+protoc --go_out=plugins=grpc:. $pathproto;
+ls $pathpbgo | xargs -n1 -IX bash -c 'sed s/,omitempty// X > X.tmp && mv X{.tmp,}';
 `
 	bt := []byte(contents)
 	_ = ioutil.WriteFile(proto2go, bt, 0644)
@@ -126,27 +129,32 @@ func GenerateProto2Go(path string) {
 	pathArr := strings.Split(path, "/")
 	pathArr = pathArr[:len(pathArr)-1]
 	path = strings.Join(pathArr, "/")
-	_ = exec.Command(bash, proto2go, path)
+	cmd := exec.Command(bash, proto2go, path)
+	g.runCmd(cmd)
 }
 
 //RunScaffold to run scaffold script
-func RunScaffold(serviceName string) {
-	exec.Command(bash, scaffold, serviceName)
+func (g generator) RunScaffold(serviceName string) {
+	cmd := exec.Command(bash, scaffold, serviceName)
 	defer func() {
 		_ = os.Remove(scaffold)
 	}()
+	g.runCmd(cmd)
 }
 
-func splitBetweenTwoChar(str, before, after string) string {
-	a := strings.SplitAfterN(str, before, 2)
-	b := strings.SplitAfterN(a[len(a)-1], after, 2)
-	if 1 == len(b) {
-		return b[0]
+func (g generator) runCmd(cmd *exec.Cmd) {
+	var outb, errb bytes.Buffer
+	cmd.Stdout = &outb
+	cmd.Stderr = &errb
+	err := cmd.Run()
+	if err != nil {
+		log.Fatal(err)
 	}
-	return b[0][0 : len(b[0])-len(after)]
 }
 
-func createSimpleNameFromProtoPath(str string) string {
-	n := len(strings.Split(str, "/"))
-	return strings.Split(str, "/")[n-2]
+func (g generator) getProtoFolder(path string) string {
+	pathArr := strings.Split(path, "/")
+	pathArr = pathArr[:len(pathArr)-1]
+	path = strings.Join(pathArr, "/")
+	return path
 }

@@ -18,13 +18,13 @@ example 'fer project --name example-service --proto pb/example/example.proto'
 }
 
 func projectGenerator(cmd *cobra.Command, args []string) {
+	g := generator.NewGenerator()
 	name, _ := cmd.Flags().GetString("name")
 	proto, _ := cmd.Flags().GetString("proto")
-	if name != "" && proto != "" {
-		g := generator.NewGenerator()
+	if name != "" {
 		g.Run(name, proto)
 	} else {
-		fmt.Println("please add --name 'example-service' for service name and --proto 'pb/example/example.proto' for proto path")
+		fmt.Println("you must add --name 'example-service' for service name, if you had proto include using this --proto 'pb/example/example.proto' for proto path")
 	}
 }
 

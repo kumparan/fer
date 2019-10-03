@@ -49,10 +49,7 @@ func (c client) Generate() {
 	for _, v := range serviceObj {
 		var returns string
 		var bodyReturn string
-
-		jParam := "("
-		jParam += strings.Join(v.Parameters, ",")
-		jParam += ")"
+		parameters := "(" + strings.Join(v.Parameters, ",") + ")"
 
 		for _, aReturn := range v.Returns {
 			returns = returns + "," + aReturn
@@ -72,7 +69,7 @@ func (c client) Generate() {
 		returns = "( " + returns + " )"
 		f.Func().Params(
 			jen.Id("c").Op("*").Id("client"),
-		).Id(v.Name).Params(c.CreateFunctionArgsClient(jParam)...).Id(returns).Block(
+		).Id(v.Name).Params(c.CreateFunctionArgsClient(parameters)...).Id(returns).Block(
 			c.CreateConn(),
 			c.CreateErrChecker(),
 			c.CreateCloseConn(),
@@ -92,11 +89,11 @@ func (c client) Generate() {
 
 //CreateFunctionArgsClient :nodoc:
 func (c client) CreateFunctionArgsClient(in string) (args []jen.Code) {
-	strlong := splitBetweenTwoChar(in, "(", ")")
-	strs := strings.Split(strlong, ", ")
-	strs = strs[1 : len(strs)-1]
+	funcArgument := splitBetweenTwoChar(in, "(", ")")
+	arguments := strings.Split(funcArgument, ", ")
+	arguments = arguments[1 : len(arguments)-1]
 	args = append(args, jen.Code(jen.Id("ctx").Qual("context", "Context")))
-	for _, v := range strs {
+	for _, v := range arguments {
 		if strings.Contains(v, ".") {
 			argItem := strings.Split(v, " ")
 			argName := argItem[0]
@@ -169,8 +166,8 @@ func (c client) SplitFunctionParameters(function string) Function {
 	params := strings.Split(splittedFunction[1], ",")
 	returns := strings.Split(splittedFunction[2], ",")
 
-	newService := Function{Name: splittedFunction[0], Parameters: params, Returns: returns}
-	return newService
+	newFunction := Function{Name: splittedFunction[0], Parameters: params, Returns: returns}
+	return newFunction
 }
 
 //CreateConn to generate conn code
