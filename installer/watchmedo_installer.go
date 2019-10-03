@@ -14,31 +14,26 @@ type (
 )
 
 // InstallWatchmedo :nodoc:
-func InstallWatchmedo() {
-	cmdGetPip3Location := exec.Command("which", "pip3")
+func InstallWatchmedo() string {
+	pipCmd := "pip3"
+	cmdGetPip3Location := exec.Command("which", pipCmd)
 	err := cmdGetPip3Location.Run()
 	if err != nil {
-		cmdGetPipLocation := exec.Command("which", "pip")
+		pipCmd = "pip"
+		cmdGetPipLocation := exec.Command("which", pipCmd)
 		err = cmdGetPipLocation.Run()
 		if err != nil {
-			fmt.Println("you must install python first")
+			fmt.Println("you must install python-pip first")
 			os.Exit(1)
 		}
-		cmdInstallWachmedoByPip := exec.Command("pip", "install", "watchdog")
-		cmdInstallWachmedoByPip.Stdout = os.Stdout
-		cmdInstallWachmedoByPip.Stderr = os.Stderr
 
-		err = cmdInstallWachmedoByPip.Run()
-		if err != nil {
-			fmt.Println(err)
-		}
 	}
-	cmdInstallWachmedoByPip3 := exec.Command("pip3", "install", "watchdog")
-	cmdInstallWachmedoByPip3.Stdout = os.Stdout
-	cmdInstallWachmedoByPip3.Stderr = os.Stderr
-
-	err = cmdInstallWachmedoByPip3.Run()
+	cmdInstallWachmedoByPip := exec.Command(pipCmd, "install", "watchdog")
+	err = cmdInstallWachmedoByPip.Run()
 	if err != nil {
 		fmt.Println(err)
+		return "fail installed watchmedo"
 	}
+	message := CheckedInstallerPath("watchmedo")
+	return message
 }
