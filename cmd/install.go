@@ -1,40 +1,76 @@
 package cmd
 
 import (
-	"context"
-
-	"github.com/kumparan/fer/repository"
+	"github.com/kumparan/fer/installer"
 	"github.com/spf13/cobra"
 )
 
 var installCmd = &cobra.Command{
 	Use:   "install",
-	Short: "install all dependencies you are need",
-	Long:  "This subcommand start the test",
+	Short: "install all dependencies",
+	Long:  "install all dependencies for contributing to backend projects",
+	Run:   installAllCmd,
 }
 
-var chgLogCmd = &cobra.Command{
-	Use:   "chglog",
-	Short: "install all dependencies to generate changelog",
-	Long:  "This subcommand to install git change-log",
-	RunE:  installchglogCmd,
+func installAllCmd(_ *cobra.Command, _ []string) {
+	installAll()
+}
+
+func installAll() {
+	installer.CheckExistenceOfGolang()
+	installer.CheckGolangVersion()
+	installer.InstallProtobuf()
+	installer.InstallMockgen()
+	installer.InstallRichgo()
+	installer.InstallGoLint()
+	installer.InstallChangelog()
+	installer.CheckExistenceOfChangelog()
+	installer.CheckChangelogVersion()
+	installer.CheckExistenceOfMake()
+	installer.InstallWatchmedo()
 }
 
 func init() {
-	installCmd.AddCommand(chgLogCmd)
+	installCmd.AddCommand(goUtilsCmd)
+	installCmd.AddCommand(watchmedoCmd)
 	RootCmd.AddCommand(installCmd)
 }
 
-func installchglogCmd(cmd *cobra.Command, args []string) error {
-	return installChglog(context.TODO())
+var goUtilsCmd = &cobra.Command{
+	Use:   "goutils",
+	Short: "fer install goutils",
+	Long:  "This subcommand to install git go utils like ",
+	Run:   installGoUtilsCmd,
 }
 
-func installChglog(ctx context.Context) error {
-	repository.CheckExistenceOfGolang()
-	repository.CheckGolangVersion()
-	repository.InstalltheChangelog()
-	repository.CheckExistenceOfChangelog()
-	repository.CheckChangelogVersion()
+func installGoUtilsCmd(_ *cobra.Command, _ []string) {
+	installGoUtils()
+}
 
-	return nil
+func installGoUtils() {
+	installer.CheckExistenceOfGolang()
+	installer.CheckGolangVersion()
+	installer.InstallProtobuf()
+	installer.InstallMockgen()
+	installer.InstallRichgo()
+	installer.InstallGoLint()
+	installer.InstallChangelog()
+	installer.CheckExistenceOfChangelog()
+	installer.CheckChangelogVersion()
+	installer.CheckExistenceOfMake()
+}
+
+var watchmedoCmd = &cobra.Command{
+	Use:   "watchmedo",
+	Short: "fer install watchmedo",
+	Long:  "This subcommand to install watchmedo",
+	Run:   installWatchmedoCmd,
+}
+
+func installWatchmedoCmd(cmd *cobra.Command, args []string) {
+	installWatchmedo()
+}
+
+func installWatchmedo() {
+	installer.InstallWatchmedo()
 }
