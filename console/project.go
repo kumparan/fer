@@ -1,13 +1,14 @@
-package cmd
+package console
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/kumparan/fer/generator"
 	"github.com/spf13/cobra"
 )
 
-// projectCmd represents the init command
+// projectCmd represents the project command
 var projectCmd = &cobra.Command{
 	Use:   "project",
 	Short: "project",
@@ -19,8 +20,14 @@ example 'fer project --name example-service --proto pb/example/example.proto'
 
 func projectGenerator(cmd *cobra.Command, args []string) {
 	g := generator.NewGenerator()
-	name, _ := cmd.Flags().GetString("name")
-	proto, _ := cmd.Flags().GetString("proto")
+	name, err := cmd.Flags().GetString("name")
+	if err!=nil{
+		log.Fatal("fail retreive --name flag")
+	}
+	proto, err := cmd.Flags().GetString("proto")
+	if err!=nil{
+		log.Fatal("fail retreive --proto flag")
+	}
 	if name != "" {
 		g.Run(name, proto)
 	} else {

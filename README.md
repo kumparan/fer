@@ -24,7 +24,7 @@ service ContentService{
 ```
 
 and create microservices
-`fer project init --name content-service`
+`fer project --name content-service`
  
  - you will be asked to insert proto source path
  `pb/content/content_service.proto` 

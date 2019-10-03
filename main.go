@@ -1,7 +1,7 @@
 package main
 
-import "github.com/kumparan/fer/cmd"
+import "github.com/kumparan/fer/console"
 
 func main() {
-	cmd.Execute()
+	console.Execute()
 }
