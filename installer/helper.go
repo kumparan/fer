@@ -29,7 +29,7 @@ func CheckGolangVersion() {
 		log.Fatal(err)
 	}
 	var goLocalversion = string(cmdGetGolangVersion)
-	var regexVersion, _ = regexp.Compile(`(\d\.\d+\.\d)`)
+	var regexVersion, _ = regexp.Compile(`(\d+\.\d+\.\d+)`)
 	v1, _ := version.NewVersion(config.GoVersion)
 	v2, _ := version.NewVersion(regexVersion.FindString(goLocalversion))
 	if v2.LessThan(v1) {

@@ -9,6 +9,7 @@ require (
 	github.com/hashicorp/go-version v1.2.0
 	github.com/kyoh86/richgo v0.3.3 // indirect
 	github.com/kyoh86/xdg v1.0.0 // indirect
+	github.com/matishsiao/goInfo v0.0.0-20170803142006-617e6440957e
 	github.com/mattn/go-isatty v0.0.9 // indirect
 	github.com/morikuni/aec v1.0.0 // indirect
 	github.com/spf13/cobra v0.0.5
