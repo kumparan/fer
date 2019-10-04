@@ -55,6 +55,7 @@ func installAll() {
 func init() {
 	installCmd.AddCommand(goUtilsCmd)
 	installCmd.AddCommand(watchmedoCmd)
+	installCmd.AddCommand(protobufCmd)
 	rootCmd.AddCommand(installCmd)
 }
 
@@ -114,7 +115,7 @@ var protobufCmd = &cobra.Command{
 	Use:   "protobuf",
 	Short: "fer install protobuf",
 	Long:  "This subcommand to install protobuf",
-	Run:   installWatchmedoCmd,
+	Run:   installProtobufCmd,
 }
 
 func installProtobufCmd(cmd *cobra.Command, args []string) {
