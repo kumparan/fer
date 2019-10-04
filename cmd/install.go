@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/kumparan/fer/config"
 	"github.com/kumparan/fer/installer"
@@ -22,14 +23,32 @@ func installAllCmd(_ *cobra.Command, _ []string) {
 func installAll() {
 	installer.CheckExistenceOfGolang()
 	installer.CheckGolangVersion()
+	var messages = []string{}
+
 	message := installer.InstallGoUtils("protoc-gen-go", config.ProtobufInstallerURL)
+	messages = append(messages, message)
+
 	message = installer.InstallGoUtils("mockgen", config.MockgenInstallerURL)
+	messages = append(messages, message)
+
 	message = installer.InstallGoUtils("richgo", config.RichgoInstallerURL)
+	messages = append(messages, message)
+
 	message = installer.InstallGoUtils("golint", config.GolintInstallerURL)
+	messages = append(messages, message)
+
 	message = installer.InstallGoUtils("git-chglog", config.ChangeLogInstallerURL)
+	messages = append(messages, message)
+
 	message = installer.CheckedInstallerPath("make")
+	messages = append(messages, message)
+
 	message = installer.InstallWatchmedo()
-	fmt.Printf("%+v", message)
+	messages = append(messages, message)
+
+	message = installer.ProtobufInstaller()
+	messages = append(messages, message)
+	fmt.Printf("%s", strings.Join(messages, "/n"))
 
 }
 
@@ -53,13 +72,26 @@ func installGoUtilsCmd(_ *cobra.Command, _ []string) {
 func installGoUtils() {
 	installer.CheckExistenceOfGolang()
 	installer.CheckGolangVersion()
+	var messages = []string{}
 	message := installer.InstallGoUtils("protoc-gen-go", config.ProtobufInstallerURL)
+	messages = append(messages, message)
+
 	message = installer.InstallGoUtils("mockgen", config.MockgenInstallerURL)
+	messages = append(messages, message)
+
 	message = installer.InstallGoUtils("richgo", config.RichgoInstallerURL)
+	messages = append(messages, message)
+
 	message = installer.InstallGoUtils("golint", config.GolintInstallerURL)
+	messages = append(messages, message)
+
 	message = installer.InstallGoUtils("git-chglog", config.ChangeLogInstallerURL)
+	messages = append(messages, message)
+
 	message = installer.CheckedInstallerPath("make")
-	fmt.Printf("%+v", message)
+	messages = append(messages, message)
+
+	fmt.Printf("%s", strings.Join(messages, "/n"))
 }
 
 var watchmedoCmd = &cobra.Command{
@@ -75,5 +107,21 @@ func installWatchmedoCmd(cmd *cobra.Command, args []string) {
 
 func installWatchmedo() {
 	message := installer.InstallWatchmedo()
+	fmt.Println(message)
+}
+
+var protobufCmd = &cobra.Command{
+	Use:   "protobuf",
+	Short: "fer install protobuf",
+	Long:  "This subcommand to install protobuf",
+	Run:   installWatchmedoCmd,
+}
+
+func installProtobufCmd(cmd *cobra.Command, args []string) {
+	installProtobuf()
+}
+
+func installProtobuf() {
+	message := installer.ProtobufInstaller()
 	fmt.Println(message)
 }
