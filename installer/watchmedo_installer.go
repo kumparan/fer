@@ -28,7 +28,7 @@ func InstallWatchmedo() string {
 		}
 
 	}
-	cmdInstallWachmedoByPip := exec.Command(pipCmd, "install", "watchdog")
+	cmdInstallWachmedoByPip := exec.Command(pipCmd, "install", "watczhdog")
 	err = cmdInstallWachmedoByPip.Run()
 	if err != nil {
 		fmt.Println(err)
