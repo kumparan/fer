@@ -12,7 +12,7 @@ import (
 var migrationCmd = &cobra.Command{
 	Use:   "migration [name]",
 	Short: "migration",
-	Long:  `example 'fer migrate create_promoted_link'`,
+	Long:  `example 'fer migration create_promoted_link'`,
 	Args:  cobra.ExactArgs(1),
 	Run: migrationGenerator,
 }
@@ -25,7 +25,7 @@ func migrationGenerator(cmd *cobra.Command, args []string) {
 				log.Fatal(err)
 			}
 		} else {
-			fmt.Println("please input name 'fer migrate <name>' ")
+			fmt.Println("please input name 'fer migration <name>' ")
 		}
 }
 
