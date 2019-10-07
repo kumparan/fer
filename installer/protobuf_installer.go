@@ -2,6 +2,8 @@ package installer
 
 import (
 	"fmt"
+	"io/ioutil"
+	"log"
 	"os/exec"
 	"runtime"
 
@@ -15,41 +17,46 @@ var (
 	successDownload = "success downloaded protobuf"
 )
 
-func protobufDownloadInstaller() string {
+func protobufDownloadInstaller() (filePath, message string) {
 	downloadURL := config.ProtobufLinuxInstallerURL
+	tmp, err := ioutil.TempDir("", "")
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	if runtime.GOOS == "darwin" {
 		downloadURL = config.ProtobufOSXInstallerURL
 	}
-	cmd := exec.Command("curl", "-OL", downloadURL)
-	err := cmd.Run()
+	err = DownloadFile(tmp+"/"+config.ProtocZipFileName, downloadURL)
 	if err != nil {
 		fmt.Println(err)
-		return errorDownload
+		return "", errorDownload
 	}
-	return successDownload
+	return tmp, successDownload
 }
 
 // ProtobufInstaller :nodoc:
 func ProtobufInstaller() string {
-	message := protobufDownloadInstaller()
-	protocZip := config.ProtocZipLinux
+	tmp, message := protobufDownloadInstaller()
+	protobufZipFile := config.ProtocZipFileName
+	filePath := tmp + "/" + protobufZipFile
 	if runtime.GOOS == "darwin" {
-		protocZip = config.ProtocZipOSX
+		protobufZipFile = config.ProtocZipFileName
 	}
 	if message == successDownload {
-		cmdUnzipToBinProtocPath := exec.Command("sudo", "unzip", "-o", protocZip, "-d", "/usr/local", "bin/protoc")
+		cmdUnzipToBinProtocPath := exec.Command("unzip", "-o", filePath, "-d", tmp, "bin/protoc")
 		err := cmdUnzipToBinProtocPath.Run()
 		if err != nil {
 			fmt.Println(err)
 			return errorUnzip
 		}
-		cmdProtocPath := exec.Command("sudo", "unzip", "-o", protocZip, "-d", "/usr/local", "'include/*'")
+		cmdProtocPath := exec.Command("unzip", "-o", filePath, "-d", tmp, "include/*")
 		err = cmdProtocPath.Run()
 		if err != nil {
 			fmt.Println(err)
 			return errorUnzip
 		}
-		cmdRemoveProtocZip := exec.Command("rm", "-f", protocZip)
+		cmdRemoveProtocZip := exec.Command("rm", "-f", filePath)
 		err = cmdRemoveProtocZip.Run()
 		if err != nil {
 			fmt.Println(err)
