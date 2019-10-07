@@ -17,8 +17,6 @@ const (
 	ProtobufOSXInstallerURL = "https://github.com/protocolbuffers/protobuf/releases/download/v3.7.1/protoc-3.7.1-osx-x86_64.zip"
 	// ProtobufLinuxInstallerURL :nodoc:
 	ProtobufLinuxInstallerURL = "https://github.com/protocolbuffers/protobuf/releases/download/v3.7.1/protoc-3.7.1-linux-x86_64.zip"
-	// ProtocZipOSX :nodoc:
-	ProtocZipOSX = "protoc-3.7.1-osx-x86_64.zip"
-	// ProtocZipLinux :nodoc:
-	ProtocZipLinux = "protoc-3.7.1-linux-x86_64.zip"
+	// ProtocZipFileName :nodoc:
+	ProtocZipFileName = "protobuf.zip"
 )
