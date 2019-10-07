@@ -17,16 +17,16 @@ type (
 		Generate(name string) error
 	}
 
-	migrate struct{}
+	migration struct{}
 )
 
 //NewMigrationGenerator :nodoc:
 func NewMigrationGenerator() Migration {
-	return &migrate{}
+	return &migration{}
 }
 
 //GenerateMigration to generate sql migration file
-func (m migrate) Generate(name string) error {
+func (m migration) Generate(name string) error {
 	err := m.checkMigrationFolderExists()
 	if err != nil {
 		return err
@@ -41,7 +41,7 @@ func (m migrate) Generate(name string) error {
 	return nil
 }
 
-func (m migrate) checkMigrationFolderExists() error {
+func (m migration) checkMigrationFolderExists() error {
 	_, err := os.Stat("db/migration/")
 	if os.IsNotExist(err) { //check if db/migration folder is already exist
 		reader := bufio.NewReader(os.Stdin)
@@ -50,7 +50,7 @@ func (m migrate) checkMigrationFolderExists() error {
 		if err != nil {
 			return errors.New("fail when read user input")
 		}
-		ans := strings.Contains(strings.ToUpper(input),"Y")
+		ans := strings.Contains(strings.ToUpper(input), "Y")
 		if !ans {
 			return errors.New("cancel create migration")
 		}
@@ -63,7 +63,7 @@ func (m migrate) checkMigrationFolderExists() error {
 
 }
 
-func (m migrate) createMigrationFolder() error {
+func (m migration) createMigrationFolder() error {
 	_, err := os.Stat("db/")
 	if os.IsNotExist(err) { //check if db folder is already exist
 		err := os.Mkdir("db/", os.ModePerm)
@@ -71,15 +71,14 @@ func (m migrate) createMigrationFolder() error {
 			return err
 		}
 	}
-	err = os.MkdirAll("db/migration/", os.ModePerm )
+	err = os.MkdirAll("db/migration/", os.ModePerm)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-
-func (m migrate) createUniqueTime() string {
+func (m migration) createUniqueTime() string {
 	now := time.Now()
 	splitDate := strings.Split(now.Format("01/02/2006"), "/") // mm/dd/yyyy
 	newDate := splitDate[2] + splitDate[0] + splitDate[1]

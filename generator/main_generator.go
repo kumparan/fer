@@ -3,9 +3,10 @@ package generator
 import (
 	"bytes"
 	"fmt"
-	"github.com/kumparan/fer/util"
 	"io/ioutil"
 	"log"
+
+	"github.com/kumparan/fer/util"
 
 	"os"
 	"os/exec"

@@ -2,17 +2,8 @@
 fer is not Ferdian
 
 ## INSTALL
-Clone the repository to your desired destination folder e.g :
 ```
-cd ~ && git clone git@github.com:kumparan/fer.git
-```
-run build
-```
-go build
-```
-run  install
-```
-go install
+go get github.com/kumparan/fer
 ```
 
 It should be available as command now in terminal
