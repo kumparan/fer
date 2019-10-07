@@ -14,19 +14,19 @@ var migrationCmd = &cobra.Command{
 	Short: "migration",
 	Long:  `example 'fer migration create_promoted_link'`,
 	Args:  cobra.ExactArgs(1),
-	Run: migrationGenerator,
+	Run:   migrationGenerator,
 }
 
 func migrationGenerator(cmd *cobra.Command, args []string) {
-		if args[0] != "" {
-			m := generator.NewMigrationGenerator()
-			err := m.Generate(args[0])
-			if err != nil {
-				log.Fatal(err)
-			}
-		} else {
-			fmt.Println("please input name 'fer migration <name>' ")
+	if args[0] != "" {
+		m := generator.NewMigrationGenerator()
+		err := m.Generate(args[0])
+		if err != nil {
+			log.Fatal(err)
 		}
+	} else {
+		fmt.Println("please input name 'fer migration <name>' ")
+	}
 }
 
 func init() {
