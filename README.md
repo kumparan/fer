@@ -1,6 +1,30 @@
 # fer
 fer is not Ferdian
 
+## INSTALL
+Clone the repository to your desired destination folder e.g :
+```
+cd ~ && git clone git@github.com:kumparan/fer.git
+```
+run build
+```
+go build
+```
+run  install
+```
+go install
+```
+
+It should be available as command now in terminal
+
+## Feature
+-   [x] Scaffold New Microservices
+-   [x] Generate Service&test files and Client files From Proto
+-   [ ] Generate Repository (include model)
+-   [ ] Add worker with command
+-   [ ] Add Nats Subscriber with command
+-   [x] db migration file generator
+
 # Kumparan Microservices Generator 
 
 you can make microservices start from proto. see the proto example in `pb/` folder
@@ -51,29 +75,15 @@ and create microservices
     -LICENSE
     -main.go
     -Makefile
-    -README.mod
+    -README.md
  ```
 
-## INSTALL
-Clone the repository to your desired destination folder e.g :
-```
-cd ~ && git clone git@github.com:kumparan/fer.git
-```
-run build
-```
-go build
-```
-run  install
-```
-go install
-```
+#DB MigrationFile Generator
+You can create db migration file
 
-It should be available as command now in terminal
+`fer migration create_story`
 
-## Feature
--   [x] Scaffold New Microservices
--   [x] Generate Service&test files and Client files From Proto
--   [ ] Generate Repository (include model)
--   [ ] Add worker with command
--   [ ] Add Nats Subscriber with command
--   [ ] db migration file generator
+and new migration will created like this
+
+`db/migration/20191007130809_create_story.sql`
+
