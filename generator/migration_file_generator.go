@@ -29,7 +29,7 @@ func NewMigrationGenerator() Migration {
 func (m migrate) Generate(name string) error {
 	err := m.checkMigrationFolderExists()
 	if err != nil {
-		fmt.Println(err)
+		return err
 	}
 	migrationFile := []byte(`-- +migrate Up notransaction` + "\n\n" + `-- +migrate Down`)
 	migrationFileName := "db/migration/" + m.createUniqueTime() + "_" + strings.ToLower(name) + ".sql"
@@ -50,12 +50,13 @@ func (m migrate) checkMigrationFolderExists() error {
 		if err != nil {
 			return errors.New("fail when read user input")
 		}
-		ans := strings.Contains(input, "y")
-		if ans {
-			err = m.createMigrationFolder()
-			if err != nil {
-				return err
-			}
+		ans := strings.Contains(strings.ToUpper(input),"Y")
+		if !ans {
+			return errors.New("cancel create migration")
+		}
+		err = m.createMigrationFolder()
+		if err != nil {
+			return err
 		}
 	}
 	return nil
@@ -65,17 +66,18 @@ func (m migrate) checkMigrationFolderExists() error {
 func (m migrate) createMigrationFolder() error {
 	_, err := os.Stat("db/")
 	if os.IsNotExist(err) { //check if db folder is already exist
-		err := os.Mkdir("db/", 0666)
+		err := os.Mkdir("db/", os.ModePerm)
 		if err != nil {
 			return err
 		}
 	}
-	err = os.Mkdir("db/migration/", 0666)
+	err = os.MkdirAll("db/migration/", os.ModePerm )
 	if err != nil {
 		return err
 	}
 	return nil
 }
+
 
 func (m migrate) createUniqueTime() string {
 	now := time.Now()
