@@ -1,0 +1,8 @@
+syntax = "proto3";
+package pb.content;
+option go_package = "example";
+
+message Topic {
+    int64 id = 1;
+}
+
