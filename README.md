@@ -6,7 +6,12 @@ fer is not Ferdian
 go get github.com/kumparan/fer
 ```
 
-It should be available as command now in terminal
+It should be available as command now in terminal.
+
+Check fer version
+```
+fer version
+```
 
 ## Feature
 -   [x] Scaffold New Microservices
@@ -39,7 +44,7 @@ service ContentService{
 ```
 
 and create microservices
-`fer project --name content-service`
+`fer generate project --name content-service`
  
  - you will be asked to insert proto source path
  `pb/content/content_service.proto` 
@@ -72,7 +77,7 @@ and create microservices
 ## DB MigrationFile Generator
 You can create db migration file
 
-`fer migration create_story`
+`fer generate migration create_story`
 
 and new migration will be created like this
 
@@ -80,7 +85,7 @@ and new migration will be created like this
 
 ## Repository & Model Generator
 You can create repository and model file
-`fer repository promoted_link`
+`fer generate repository promoted_link`
 
 and new repository and model will be created like this 
 ```

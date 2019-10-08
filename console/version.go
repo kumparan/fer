@@ -10,15 +10,11 @@ import (
 
 var versionCmd = &cobra.Command{
 	Use:   "version",
-	Short: "version",
+	Short: "print fer version",
 	Long:  `print version of fer`,
-	Run:   versionPrint,
+	Run:   printVersion,
 }
 
-func versionPrint(cmd *cobra.Command, args []string) {
+func printVersion(cmd *cobra.Command, args []string) {
 	fmt.Println(config.Version)
-}
-
-func init() {
-	rootCmd.AddCommand(versionCmd)
 }

@@ -11,14 +11,14 @@ import (
 // migrationCmd represents the migration command
 var migrationCmd = &cobra.Command{
 	Use:   "migration [name]",
-	Short: "migration",
+	Short: "migration generator",
 	Long: `Create DB Migration file,
-example 'fer migration create_promoted_link'`,
+example 'fer generate migration create_promoted_link'`,
 	Args: cobra.ExactArgs(1),
-	Run:  migrationGenerator,
+	Run:  generateMigration,
 }
 
-func migrationGenerator(cmd *cobra.Command, args []string) {
+func generateMigration(cmd *cobra.Command, args []string) {
 	if args[0] != "" {
 		m := generator.NewMigrationGenerator()
 		err := m.Generate(args[0])
@@ -26,10 +26,6 @@ func migrationGenerator(cmd *cobra.Command, args []string) {
 			log.Fatal(err)
 		}
 	} else {
-		fmt.Println("please input name 'fer migration <name>' ")
+		fmt.Println("please input name 'fer generate migration <name>' ")
 	}
-}
-
-func init() {
-	rootCmd.AddCommand(migrationCmd)
 }

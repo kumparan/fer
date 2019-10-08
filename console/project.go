@@ -11,16 +11,16 @@ import (
 // projectCmd represents the project command
 var projectCmd = &cobra.Command{
 	Use:   "project",
-	Short: "project",
+	Short: "project generator",
 	Long: `fer project is a microservice generator, you can generate microservice from proto.
-example 'fer project example-service --proto pb/example/example.proto' 
+example 'fer generate project example-service --proto pb/example/example.proto' 
 		`,
 	Args: cobra.ExactArgs(1),
-	Run:  projectGenerator,
+	Run:  generateProject,
 }
 
-func projectGenerator(cmd *cobra.Command, args []string) {
-	g := generator.NewGenerator()
+func generateProject(cmd *cobra.Command, args []string) {
+	g := generator.NewProjectGenerator()
 	name := args[0]
 	proto, err := cmd.Flags().GetString("proto")
 	if err != nil {
@@ -29,11 +29,10 @@ func projectGenerator(cmd *cobra.Command, args []string) {
 	if name != "" {
 		g.Run(name, proto)
 	} else {
-		fmt.Println("you must add name in 'fer project <name>' for service name, if you had proto include using this --proto 'pb/example/example.proto' for proto path")
+		fmt.Println("you must add name in 'fer generate project <name>' for service name, if you had proto include using this --proto 'pb/example/example.proto' for proto path")
 	}
 }
 
 func init() {
-	rootCmd.AddCommand(projectCmd)
 	projectCmd.Flags().String("proto", "", "[optional] proto path to generate service")
 }

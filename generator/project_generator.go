@@ -22,11 +22,11 @@ const (
 )
 
 type (
-	//Generator define generator
-	Generator interface {
+	//Project define project
+	Project interface {
 		Run(serviceName, protoPath string)
 	}
-	generator struct {
+	project struct {
 		service     Service
 		client      Client
 		protoFile   string
@@ -34,13 +34,13 @@ type (
 	}
 )
 
-//NewGenerator :nodoc:
-func NewGenerator() Generator {
-	return &generator{}
+//NewProjectGenerator :nodoc:
+func NewProjectGenerator() Project {
+	return &project{}
 }
 
 //Generate to generate service
-func (g generator) Run(serviceName string, protoPath string) {
+func (g project) Run(serviceName string, protoPath string) {
 	g.serviceName = serviceName
 	fmt.Println(">>> " + serviceName + " <<<")
 	fmt.Println("Creating ", serviceName)
@@ -96,7 +96,7 @@ func (g generator) Run(serviceName string, protoPath string) {
 }
 
 //CreateScaffoldScript to create bash script for scaffolding
-func (g generator) CreateScaffoldScript() {
+func (g project) CreateScaffoldScript() {
 	contents := `#!/usr/bin/env bash
 servicename=$1;
 find $servicename -type f -exec sed -i '' "s/skeleton-service/$servicename/g" {} \;
@@ -112,7 +112,7 @@ go mod tidy;
 }
 
 //GetTemplates to get service template
-func (g generator) GetTemplates(serviceName string) {
+func (g project) GetTemplates(serviceName string) {
 	contents := `#!/usr/bin/env bash
 	servicename=$1;
 	cd $servicename;
@@ -141,7 +141,7 @@ func (g generator) GetTemplates(serviceName string) {
 }
 
 //GenerateProto2Go :nodoc:
-func (g generator) GenerateProto2Go(path string) {
+func (g project) GenerateProto2Go(path string) {
 	contents := `#!/usr/bin/env bash
 path=$1;	
 pathproto="${path}/*.proto";
@@ -168,7 +168,7 @@ ls $pathpbgo | xargs -n1 -IX bash -c 'sed s/,omitempty// X > X.tmp && mv X{.tmp,
 }
 
 //RunScaffold to run scaffold script
-func (g generator) RunScaffold(serviceName string) {
+func (g project) RunScaffold(serviceName string) {
 	cmd := exec.Command(bash, scaffold, serviceName)
 	defer func() {
 		_ = os.Remove(scaffold)
@@ -179,7 +179,7 @@ func (g generator) RunScaffold(serviceName string) {
 	}
 }
 
-func (g generator) runCmd(cmd *exec.Cmd) error {
+func (g project) runCmd(cmd *exec.Cmd) error {
 	var outb, errb bytes.Buffer
 	cmd.Stdout = &outb
 	cmd.Stderr = &errb
@@ -190,14 +190,14 @@ func (g generator) runCmd(cmd *exec.Cmd) error {
 	return nil
 }
 
-func (g generator) getProtoFolder(path string) string {
+func (g project) getProtoFolder(path string) string {
 	pathArr := strings.Split(path, "/")
 	pathArr = pathArr[:len(pathArr)-1]
 	path = strings.Join(pathArr, "/")
 	return path
 }
 
-func (g generator) rollbackWhenError(message string) {
+func (g project) rollbackWhenError(message string) {
 	_ = os.RemoveAll(g.serviceName)
 	_ = os.Remove(scaffold)
 	_ = os.Remove(template)

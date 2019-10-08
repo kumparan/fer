@@ -12,7 +12,7 @@ import (
 )
 
 type (
-	//Migration define migration db file generator
+	//Migration define migration db file migration
 	Migration interface {
 		Generate(name string) error
 	}
