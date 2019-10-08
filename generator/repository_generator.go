@@ -43,7 +43,7 @@ func (r repository) Generate(name string) error {
 	repo := jen.NewFile("repository")
 
 	repo.ImportAlias("github.com/jinzhu/gorm", "gorm")
-	repo.ImportAlias("github.com/kumparan/cacher", "cacheKeeper")
+	repo.ImportAlias("github.com/kumparan/cacher", "cacher")
 
 	repo.Comment(interfaceName + " :nodoc:")
 	repo.Type().Id(interfaceName).Interface(
@@ -56,7 +56,7 @@ func (r repository) Generate(name string) error {
 
 	repo.Type().Id(structName).Struct(
 		jen.Id("db").Op("*").Qual("github.com/jinzhu/gorm", "DB"),
-		jen.Id("cacheKeeper").Qual("github.com/kumparan/cacher", "Keeper"),
+		jen.Id("cacher").Qual("github.com/kumparan/cacher", "Keeper"),
 	)
 
 	repo.Comment("New" + r.toCamelCase(name) + "Repository" + " create new repository")
@@ -66,7 +66,7 @@ func (r repository) Generate(name string) error {
 	).Id(interfaceName).Block(
 		jen.Return(jen.Op("&").Id(structName).Values(jen.Dict{
 			jen.Id("db"):          jen.Id("d"),
-			jen.Id("cacheKeeper"): jen.Id("k"),
+			jen.Id("cacher"): jen.Id("k"),
 		}),
 		),
 	)
