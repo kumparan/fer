@@ -33,5 +33,5 @@ func Execute() {
 
 func init() {
 	rootCmd.AddCommand(versionCmd)
-	rootCmd.AddCommand(generatorCmd)
+	rootCmd.AddCommand(generateCmd)
 }
