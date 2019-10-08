@@ -6,21 +6,26 @@ fer is not Ferdian
 go get github.com/kumparan/fer
 ```
 
-It should be available as command now in terminal
+It should be available as command now in terminal.
+
+Check fer version
+```
+fer version
+```
 
 ## Feature
 -   [x] Scaffold New Microservices
 -   [x] Generate Service&test files and Client files From Proto
--   [ ] Generate Repository (include model)
+-   [x] DB migration file generator
+-   [x] Generate Repository (include model)
 -   [ ] Add worker with command
 -   [ ] Add Nats Subscriber with command
--   [x] db migration file generator
 
-# Kumparan Microservices Generator 
+## Kumparan Microservices Generator 
 
 you can make microservices start from proto. see the proto example in `pb/` folder
 
-## Usage
+### Usage
 you need to create proto file with services RPC with path like this
 `pb/'$service/$protoname.proto`
 
@@ -39,10 +44,7 @@ service ContentService{
 ```
 
 and create microservices
-`fer project --name content-service`
- 
- - you will be asked to insert proto source path
- `pb/content/content_service.proto` 
+`fer generate project content-service --proto pb/example/example.proto`
  
  - new service will generated like this
  ```
@@ -69,12 +71,22 @@ and create microservices
     -README.md
  ```
 
-#DB MigrationFile Generator
+## DB MigrationFile Generator
 You can create db migration file
 
-`fer migration create_story`
+`fer generate migration create_story`
 
-and new migration will created like this
+and new migration will be created like this
 
 `db/migration/20191007130809_create_story.sql`
+
+## Repository & Model Generator
+You can create repository and model file
+`fer generate repository promoted_link`
+
+and new repository and model will be created like this 
+```
+repository/model/promoted_link.go created
+repository/promoted_link_repository.go created
+```
 

@@ -7,7 +7,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/dave/jennifer/jen" //Code generator
+	"github.com/dave/jennifer/jen" //Code project
 )
 
 const (
