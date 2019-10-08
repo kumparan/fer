@@ -1,13 +1,16 @@
 package installer
 
 import (
+	"archive/zip"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"regexp"
+	"strings"
 
 	"github.com/kumparan/fer/config"
 
@@ -32,8 +35,14 @@ func CheckGolangVersion() {
 	}
 	var goLocalversion = string(cmdGetGolangVersion)
 	var regexVersion, _ = regexp.Compile(`(\d+\.\d+\.\d+)`)
-	v1, _ := version.NewVersion(config.GoVersion)
-	v2, _ := version.NewVersion(regexVersion.FindString(goLocalversion))
+	v1, err := version.NewVersion(config.GoVersion)
+	if err != nil {
+		log.Fatal(err)
+	}
+	v2, err := version.NewVersion(regexVersion.FindString(goLocalversion))
+	if err != nil {
+		log.Fatal(err)
+	}
 	if v2.LessThan(v1) {
 		fmt.Printf("Go version must be %s or latest\n", config.GoVersion)
 		os.Exit(1)
@@ -70,4 +79,61 @@ func DownloadFile(filepath string, url string) error {
 	// Write the body to file
 	_, err = io.Copy(out, resp.Body)
 	return err
+}
+
+// Unzip :nodoc:
+func Unzip(src string, dest string) ([]string, error) {
+
+	var filenames []string
+
+	r, err := zip.OpenReader(src)
+	if err != nil {
+		return filenames, err
+	}
+	defer r.Close()
+
+	for _, f := range r.File {
+
+		// Store filename/path for returning and using later on
+		fpath := filepath.Join(dest, f.Name)
+
+		// Check for ZipSlip.
+		if !strings.HasPrefix(fpath, filepath.Clean(dest)+string(os.PathSeparator)) {
+			return filenames, fmt.Errorf("%s: illegal file path", fpath)
+		}
+
+		filenames = append(filenames, fpath)
+
+		if f.FileInfo().IsDir() {
+			// Make Folder
+			os.MkdirAll(fpath, os.ModePerm)
+			continue
+		}
+
+		// Make File
+		if err = os.MkdirAll(filepath.Dir(fpath), os.ModePerm); err != nil {
+			return filenames, err
+		}
+
+		outFile, err := os.OpenFile(fpath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
+		if err != nil {
+			return filenames, err
+		}
+
+		rc, err := f.Open()
+		if err != nil {
+			return filenames, err
+		}
+
+		_, err = io.Copy(outFile, rc)
+
+		// Close the file without defer to close before next iteration of loop
+		outFile.Close()
+		rc.Close()
+
+		if err != nil {
+			return filenames, err
+		}
+	}
+	return filenames, nil
 }
