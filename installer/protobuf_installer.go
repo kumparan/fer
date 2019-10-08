@@ -44,18 +44,18 @@ func ProtobufInstaller() string {
 		protobufZipFile = config.ProtocZipFileName
 	}
 	if message == successDownload {
-		cmdUnzipToBinProtocPath := exec.Command("unzip", "-o", filePath, "-d", tmp, "bin/protoc")
-		err := cmdUnzipToBinProtocPath.Run()
+		_, err := Unzip(filePath, "/usr/local/bin/")
 		if err != nil {
-			fmt.Println(err)
+			log.Fatal(err)
 			return errorUnzip
 		}
-		cmdProtocPath := exec.Command("unzip", "-o", filePath, "-d", tmp, "include/*")
-		err = cmdProtocPath.Run()
+
+		_, err = Unzip(filePath, "include/*")
 		if err != nil {
-			fmt.Println(err)
+			log.Fatal(err)
 			return errorUnzip
 		}
+
 		cmdRemoveProtocZip := exec.Command("rm", "-f", filePath)
 		err = cmdRemoveProtocZip.Run()
 		if err != nil {
