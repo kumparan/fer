@@ -12,9 +12,10 @@ import (
 var migrationCmd = &cobra.Command{
 	Use:   "migration [name]",
 	Short: "migration",
-	Long:  `example 'fer migration create_promoted_link'`,
-	Args:  cobra.ExactArgs(1),
-	Run:   migrationGenerator,
+	Long: `Create DB Migration file,
+example 'fer migration create_promoted_link'`,
+	Args: cobra.ExactArgs(1),
+	Run:  migrationGenerator,
 }
 
 func migrationGenerator(cmd *cobra.Command, args []string) {
