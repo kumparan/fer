@@ -21,7 +21,7 @@ build:
 changelog: fetch-git create-changelog create-version
 
 fetch-git:
-	@echo 'fetching git'
+	@echo 'fetching remote'
 	@git fetch
 
 create-changelog:
