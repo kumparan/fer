@@ -18,7 +18,11 @@ run:
 build:
 	@go build -o ./bin/fer
 
-changelog: create-changelog create-version
+changelog: fetch-git create-changelog create-version
+
+fetch-git:
+	@echo 'fetching git'
+	@git fetch
 
 create-changelog:
 ifndef version
