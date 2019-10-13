@@ -6,14 +6,16 @@ import (
 )
 
 // InstallGoUtils :nodoc:
-func InstallGoUtils(installername, URL string) string {
+func InstallGoUtils(installername, URL string) {
+	fmt.Println("Installing ", installername)
 	cmd := exec.Command("go", "get", "-u", URL)
 	err := cmd.Run()
 	if err != nil {
+		ProgressBar(1)
 		fmt.Println(err)
-		return "fail installed " + installername
+		fmt.Println("fail installed " + installername)
 	}
+	ProgressBar(100)
 	message := CheckedInstallerPath(installername)
-	return message
-
+	fmt.Println(message)
 }

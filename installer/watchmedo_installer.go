@@ -14,7 +14,7 @@ type (
 )
 
 // InstallWatchmedo :nodoc:
-func InstallWatchmedo() string {
+func InstallWatchmedo() {
 	pipCmd := "pip3"
 	cmdGetPip3Location := exec.Command("which", pipCmd)
 	err := cmdGetPip3Location.Run()
@@ -31,9 +31,11 @@ func InstallWatchmedo() string {
 	cmdInstallWachmedoByPip := exec.Command(pipCmd, "install", "watchdog")
 	err = cmdInstallWachmedoByPip.Run()
 	if err != nil {
+		ProgressBar(1)
 		fmt.Println(err)
-		return "fail installed watchmedo"
+		fmt.Println("fail installed watchmedo")
 	}
+	ProgressBar(100)
 	message := CheckedInstallerPath("watchmedo")
-	return message
+	fmt.Println(message)
 }
