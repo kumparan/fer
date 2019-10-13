@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"os/exec"
 	"runtime"
 
@@ -18,6 +19,7 @@ var (
 )
 
 func protobufDownloadInstaller() (filePath, message string) {
+	fmt.Println("Download protobuf")
 	downloadURL := config.ProtobufLinuxInstallerURL
 	tmp, err := ioutil.TempDir("", "")
 	if err != nil {
@@ -32,11 +34,14 @@ func protobufDownloadInstaller() (filePath, message string) {
 		fmt.Println(err)
 		return "", errorDownload
 	}
+	ProgressBar(100)
+	fmt.Println(successDownload)
 	return tmp, successDownload
 }
 
 // ProtobufInstaller :nodoc:
-func ProtobufInstaller() string {
+func ProtobufInstaller() {
+	fmt.Println("Installing protobuf")
 	tmp, message := protobufDownloadInstaller()
 	protobufZipFile := config.ProtocZipFileName
 	filePath := tmp + "/" + protobufZipFile
@@ -44,26 +49,37 @@ func ProtobufInstaller() string {
 		protobufZipFile = config.ProtocZipFileName
 	}
 	if message == successDownload {
+		fmt.Println("Configure protobuf")
 		_, err := Unzip(filePath, "/usr/local/bin/")
 		if err != nil {
+			ProgressBar(1)
 			log.Fatal(err)
-			return errorUnzip
+			fmt.Println(errorUnzip)
+			os.Exit(1)
 		}
 
 		_, err = Unzip(filePath, "include/*")
 		if err != nil {
+			ProgressBar(1)
 			log.Fatal(err)
-			return errorUnzip
+			fmt.Println(errorUnzip)
+			os.Exit(1)
 		}
 
 		cmdRemoveProtocZip := exec.Command("rm", "-f", filePath)
 		err = cmdRemoveProtocZip.Run()
 		if err != nil {
-			fmt.Println(err)
-			return errorUnzip
+			ProgressBar(1)
+			log.Fatal(err)
+			fmt.Println(errorUnzip)
+			os.Exit(1)
 		}
 		checkedMessage := CheckedInstallerPath("protoc")
-		return checkedMessage
+		ProgressBar(100)
+		fmt.Println(checkedMessage)
+		os.Exit(0)
 	}
-	return errorInstall
+	ProgressBar(1)
+	fmt.Println(message)
+	os.Exit(1)
 }
