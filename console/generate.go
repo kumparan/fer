@@ -13,6 +13,7 @@ func init() {
 	generateCmd.AddCommand(projectCmd)
 	generateCmd.AddCommand(migrationCmd)
 	generateCmd.AddCommand(repositoryCmd)
+	generateCmd.AddCommand(generateChglogCmd)
 }
 
 // generateCmd represents the generate command
@@ -90,4 +91,24 @@ func generateMigration(cmd *cobra.Command, args []string) {
 	} else {
 		fmt.Println("please input name 'fer generate migration <name>' ")
 	}
+}
+
+var generateChglogCmd = &cobra.Command{
+	Use:   "chglog [style] [url]",
+	Short: "Generate the changelog configuration file",
+	Long:  "This subcommand to generate changelog ",
+	Args:  cobra.ExactArgs(2),
+	Run:   generateChglog,
+}
+
+func generateChglog(cmd *cobra.Command, args []string) {
+	if args[0] == "" {
+		fmt.Println("please input style 'fer generate chglog <style>' ")
+	}
+	if args[1] == "" {
+		fmt.Println("please input repository URL 'fer generate chglog <style> <url>' ")
+	}
+	style := args[0]
+	url := args[1]
+	generator.InitChangelog(style, url)
 }

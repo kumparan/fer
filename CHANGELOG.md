@@ -1,5 +1,14 @@
 #Fer 
 
+<a name="v1.1.1"></a>
+## [v1.1.1] - 0001-01-01
+
+<a name="v.1.0.1"></a>
+## [v.1.0.1] - 2019-10-10
+### New Features
+- add test repository generator ([#5](https://github.com/kumparan/fer/issues/5))
+
+
 <a name="v1.0.0"></a>
 ## v1.0.0 - 2019-10-08
 ### New Features
@@ -8,4 +17,6 @@
 - db migrationfile generator ([#3](https://github.com/kumparan/fer/issues/3))
 
 
-[Unreleased]: https://github.com/kumparan/fer/compare/v1.0.0...HEAD
+[Unreleased]: https://github.com/kumparan/fer/compare/v1.1.1...HEAD
+[v1.1.1]: https://github.com/kumparan/fer/compare/v.1.0.1...v1.1.1
+[v.1.0.1]: https://github.com/kumparan/fer/compare/v1.0.0...v.1.0.1
