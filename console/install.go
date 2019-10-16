@@ -24,7 +24,6 @@ func init(){
 	installCmd.AddCommand(chglogCmd)
 	installCmd.AddCommand(watchmedoCmd)
 	installCmd.AddCommand(protobufCmd)
-	rootCmd.AddCommand(installCmd)
 }
 
 var installAllCmd = &cobra.Command{
@@ -137,7 +136,7 @@ func installChglogCmd(_ *cobra.Command, _ []string) {
 
 var watchmedoCmd = &cobra.Command{
 	Use:   "watchmedo",
-	Short: "fer install watchmedo",
+	Short: "This subcommand to install watchmedo",
 	Long:  "Watchdog comes with an optional utility script called watchmedo.",
 	Run:   installWatchmedoCmd,
 }
@@ -149,7 +148,7 @@ func installWatchmedoCmd(cmd *cobra.Command, args []string) {
 
 var protobufCmd = &cobra.Command{
 	Use:   "protobuf",
-	Short: "fer install protobuf",
+	Short: "This subcommand to install protobuf",
 	Long:  "Protocol Buffers (a.k.a., protobuf) are Google's language-neutral, platform-neutral, extensible mechanism for serializing structured data.",
 	Run:   installProtobufCmd,
 }

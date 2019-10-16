@@ -5,22 +5,22 @@ info:
   repository_url: https://github.com/kumparan/fer
 options:
   commits:
-     filters:
-       Type:
-         - feature
-         - bugfix
-         - hotfix
-         - refactor
-         - test
-         - misc
+    filters:
+      Type:
+        - feature
+        - bugfix
+        - hotfix
+        - refactor
+        - test
+        - misc
   commit_groups:
-     title_maps:
-       feature: New Features
-       bugfix: Fixes
-       hotfix: Fixes
-       refactor: Code Improvements
-       test: Test Improvements
-       misc: Other Improvements
+    title_maps:
+      feature: New Features
+      bugfix: Fixes
+      hotfix: Fixes
+      refactor: Code Improvements
+      test: Test Improvements
+      misc: Other Improvements
   header:
     pattern: "^(\\w*)\\:\\s(.*)$"
     pattern_maps:

@@ -10,7 +10,7 @@ import (
 // InitChangelog :nodoc:
 func InitChangelog() {
 	fmt.Println("Generate changelog configuration")
-	err := os.Mkdir(".chglog2121", os.ModePerm)
+	err := os.Mkdir(".chglog", os.ModePerm)
 	if err != nil {
 		installer.ProgressBar(1)
 		fmt.Println(err)
