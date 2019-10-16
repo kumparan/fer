@@ -49,7 +49,7 @@ func installAll(_ *cobra.Command, _ []string) {
 var goUtilsCmd = &cobra.Command{
 	Use:   "goutils",
 	Short: "This subcommand to install all go utils",
-	Long:  "To install all goutils, your golang version must 1.12.77 or latest",
+	Long:  "To install all goutils, your golang version must %s or latest",
 	Run:   installGoUtilsCmd,
 }
 
@@ -67,7 +67,7 @@ func installGoUtilsCmd(_ *cobra.Command, _ []string) {
 var protocGenCmd = &cobra.Command{
 	Use:   "protoc-gen",
 	Short: "This subcommand to install protoc generator",
-	Long:  "To install protoc-gen, your golang version must 1.12.77 or latest",
+	Long:  "Go version must be " +config.GoVersion+ " or latest",
 	Run:   installProtocGenCmd,
 }
 
