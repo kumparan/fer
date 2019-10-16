@@ -155,8 +155,8 @@ func ProgressBar(stopProgress int) {
 	bar.Finish()
 }
 
-// CreateChangelogyml :nodoc:
-func CreateChangelogyml(style, repositoryURL string) string {
+// CreateChangelogYAML :nodoc:
+func CreateChangelogYAML(style, repositoryURL string) string {
 	var configurationText = `style: ` + style + `
 	template: CHANGELOG.tpl.md
 	info:
@@ -196,8 +196,6 @@ func CreateChangelogyml(style, repositoryURL string) string {
 // CreateChangelogMD :nodoc:
 func CreateChangelogMD() string {
 	var changelogmd = `{{ if .Versions -}}
-<a name="unreleased"></a>
-## [Unreleased]
 
 {{ if .Unreleased.CommitGroups -}}
 {{ range .Unreleased.CommitGroups -}}
