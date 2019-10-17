@@ -173,10 +173,14 @@ func CreateScript() {
 //
 func (b *deploy) Run(target string) {
 	CreateScript()
+	defer func() {
+		_ = os.Remove(deployshell)
+	}()
 	target, flag, err := checkTarget(target)
 	if err != nil {
 		_ = os.Remove(deployshell)
-		log.Fatal(err)
+		log.Fatal(`unknown target.
+available target : beta,dev-a,dev-b,dev-c,dev-d,dev-e,preview,stable`)
 	}
 	cmd := exec.Command("bash", deployshell, flag, target)
 	fmt.Println("Deploying to", target)
@@ -208,8 +212,7 @@ func checkTarget(target string) (targetResult, flag string, err error) {
 		flag = "-r"
 		return
 	}
-	err = errors.New(`unknown target.
-available target : beta,dev-a,dev-b,dev-c,dev-d,dev-e,preview,stable`)
+	err = errors.New(`unknown target`)
 	return
 }
 
