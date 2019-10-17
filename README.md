@@ -22,6 +22,7 @@ fer version
 -   [ ] Add Nats Subscriber with command
 
 ## Kumparan Microservices Generator 
+`fer generate project content-service --proto pb/example/example.proto`
 
 you can make microservices start from proto. see the proto example in `pb/` folder
 
@@ -89,4 +90,10 @@ and new repository and model will be created like this
 repository/model/promoted_link.go created
 repository/promoted_link_repository.go created
 ```
+
+## Push Deploy Tag
+`fer deploy dev-a`
+for deployment, push deployment tag
+
+
 
