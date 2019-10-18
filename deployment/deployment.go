@@ -1,4 +1,4 @@
-package deploy
+package deployment
 
 import (
 	"bufio"
@@ -14,8 +14,8 @@ import (
 )
 
 const (
-	//AvailableTarget define to info the command
-	AvailableTarget = "available target, beta,dev-a,dev-b,dev-c,dev-d,dev-e,staging,prod"
+	//AvailableTargets define to info the command
+	AvailableTargets = "available targets: beta,dev-a,dev-b,dev-c,dev-d,dev-e,staging,prod"
 )
 
 var targetMap = map[string]string{
@@ -30,26 +30,25 @@ var targetMap = map[string]string{
 }
 
 type (
-	//Deploy define deploy
-	Deploy interface {
+	//Deployment define deployment
+	Deployment interface {
 		Run(target string)
 	}
-	deploy struct{}
+	deployment struct{}
 )
 
-//NewDeploy ...
-func NewDeploy() Deploy {
-	return &deploy{}
+//NewDeployment ...
+func NewDeployment() Deployment {
+	return &deployment{}
 }
 
 //
-func (b *deploy) Run(target string) {
+func (d *deployment) Run(target string) {
 	reader := bufio.NewReader(os.Stdin)
 	target, err := checkTarget(target)
 	if err != nil {
-		log.Fatal("unknown target. \navailable target : beta,dev-a,dev-b,dev-c,dev-d,dev-e,staging,prod")
+		log.Fatal("unknown target.\n", AvailableTargets)
 	}
-
 	tagTime := CreateTagTime()
 	tag := target + "-" + tagTime
 	fmt.Println("Releasing verion to |", target, "|")
@@ -87,7 +86,7 @@ func checkTarget(target string) (targetResult string, err error) {
 			return
 		}
 	}
-	err = errors.New(`unknown target`)
+	err = errors.New("unknown target")
 	return
 }
 

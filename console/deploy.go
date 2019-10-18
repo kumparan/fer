@@ -3,24 +3,28 @@ package console
 import (
 	"strings"
 
-	dep "github.com/kumparan/fer/deploy"
+	"github.com/kumparan/fer/deployment"
 	"github.com/spf13/cobra"
 )
 
 func init() {
-	rootCmd.AddCommand(deployCmd)
+	rootCmd.AddCommand(deploymentCmd)
 }
 
-var deployCmd = &cobra.Command{
+const (
+	deployExample = `example "fer deploy dev-a"`
+)
+
+var deploymentCmd = &cobra.Command{
 	Use:   "deploy [target]",
-	Short: "for service deployment, " + dep.AvailableTarget,
-	Long:  "for service deployment, " + dep.AvailableTarget,
+	Short: "service deployment",
+	Long:  deployExample + "\nfor service deployment\n" + deployment.AvailableTargets,
 	Args:  cobra.ExactArgs(1),
-	Run:   deployService,
+	Run:   deploymentService,
 }
 
-func deployService(cmd *cobra.Command, args []string) {
+func deploymentService(cmd *cobra.Command, args []string) {
 	dest := args[0]
-	deploy := dep.NewDeploy()
-	deploy.Run(strings.ToLower(dest))
+	d := deployment.NewDeployment()
+	d.Run(strings.ToLower(dest))
 }
