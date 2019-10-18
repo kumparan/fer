@@ -1,5 +1,11 @@
 #Fer 
 
+<a name="v1.1.0"></a>
+## [v1.1.0] - 2019-10-18
+### New Features
+- add command to push deploy tag ([#7](https://github.com/kumparan/fer/issues/7))
+
+
 <a name="v1.0.1"></a>
 ## [v1.0.1] - 2019-10-10
 ### New Features
@@ -14,5 +20,6 @@
 - db migrationfile generator ([#3](https://github.com/kumparan/fer/issues/3))
 
 
-[Unreleased]: https://github.com/kumparan/fer/compare/v1.0.1...HEAD
+[Unreleased]: https://github.com/kumparan/fer/compare/v1.1.0...HEAD
+[v1.1.0]: https://github.com/kumparan/fer/compare/v1.0.1...v1.1.0
 [v1.0.1]: https://github.com/kumparan/fer/compare/v1.0.0...v1.0.1
