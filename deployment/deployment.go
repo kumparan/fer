@@ -15,11 +15,11 @@ import (
 
 const (
 	//AvailableTargets define to info the command
-	AvailableTargets = "available targets: beta,dev-a,dev-b,dev-c,dev-d,dev-e,staging,prod"
+	AvailableTargets = "available targets: dev,dev-a,dev-b,dev-c,dev-d,dev-e,staging,prod"
 )
 
 var targetMap = map[string]string{
-	"beta":    "beta",
+	"dev":     "beta",
 	"dev-a":   "dev-a",
 	"dev-b":   "dev-a",
 	"dev-c":   "dev-a",
