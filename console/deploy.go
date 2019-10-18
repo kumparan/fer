@@ -13,11 +13,10 @@ func init() {
 
 var deployCmd = &cobra.Command{
 	Use:   "deploy [target]",
-	Short: "for service deployment, available target : beta,dev-a,dev-b,dev-c,dev-d,dev-e,preview,stable",
-	Long:  `for service deployment, available target : beta,dev-a,dev-b,dev-c,dev-d,dev-e,preview,stable`,
+	Short: "for service deployment, " + dep.AvailableTarget,
+	Long:  "for service deployment, " + dep.AvailableTarget,
 	Args:  cobra.ExactArgs(1),
-
-	Run: deployService,
+	Run:   deployService,
 }
 
 func deployService(cmd *cobra.Command, args []string) {

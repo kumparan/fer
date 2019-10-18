@@ -38,12 +38,12 @@ func (r repository) Generate(name string) error {
 		return err
 	}
 	fileName := strings.ToLower(name) + "_repository"
-	testFileName := fileName+"_test"
+	testFileName := fileName + "_test"
 	structName := strings.ToLower(r.toCamelCase(name)) + "Repo"
 	structAlias := string(fileName[0])
 	interfaceName := r.toCamelCase(name) + "Repository"
 	repo := jen.NewFile("repository")
-	repoTest:= jen.NewFile("repository")
+	repoTest := jen.NewFile("repository")
 
 	repo.ImportAlias("github.com/jinzhu/gorm", "gorm")
 	repo.ImportAlias("github.com/kumparan/cacher", "cacher")
@@ -68,35 +68,34 @@ func (r repository) Generate(name string) error {
 		jen.Id("k").Qual("github.com/kumparan/cacher", "Keeper")),
 	).Id(interfaceName).Block(
 		jen.Return(jen.Op("&").Id(structName).Values(jen.Dict{
-			jen.Id("db"):          jen.Id("d"),
+			jen.Id("db"):     jen.Id("d"),
 			jen.Id("cacher"): jen.Id("k"),
 		}),
 		),
 	)
 
 	//TestCoreName
-	testFuncName := "Test"+r.toCamelCase(name)+"Repo"
+	testFuncName := "Test" + r.toCamelCase(name) + "Repo"
 
 	//Create
 	repo.Func().Params(jen.Id(structAlias).Id(structName)).Id("Create").Params(r.createContextParam()).Parens(jen.Id("err").Error()).Block(jen.Return())
-	repoTest.Func().Id(testFuncName+"_Create").Params(r.createTestingParam()).Block()
+	repoTest.Func().Id(testFuncName + "_Create").Params(r.createTestingParam()).Block()
 
 	//FindByID
 	repo.Func().Params(jen.Id(structAlias).Id(structName)).Id("FindByID").Params(r.createContextParam(), jen.Id("id").String()).Parens(jen.Id("err").Error()).Block(jen.Return())
-	repoTest.Func().Id(testFuncName+"_FindByID").Params(r.createTestingParam()).Block()
+	repoTest.Func().Id(testFuncName + "_FindByID").Params(r.createTestingParam()).Block()
 
 	//UpdateByID
 	repo.Func().Params(jen.Id(structAlias).Id(structName)).Id("UpdateByID").Params(r.createContextParam(), jen.Id("id").String()).Parens(jen.Id("err").Error()).Block(jen.Return())
-	repoTest.Func().Id(testFuncName+"_UpdateByID").Params(r.createTestingParam()).Block()
+	repoTest.Func().Id(testFuncName + "_UpdateByID").Params(r.createTestingParam()).Block()
 
 	//DeleteByID
 	repo.Func().Params(jen.Id(structAlias).Id(structName)).Id("DeleteByID").Params(r.createContextParam(), jen.Id("id").String()).Parens(jen.Id("err").Error()).Block(jen.Return())
-	repoTest.Func().Id(testFuncName+"_DeleteByID").Params(r.createTestingParam()).Block()
+	repoTest.Func().Id(testFuncName + "_DeleteByID").Params(r.createTestingParam()).Block()
 
 	//FindAll
 	repo.Func().Params(jen.Id(structAlias).Id(structName)).Id("FindAll").Params(r.createContextParam()).Parens(jen.Id("err").Error()).Block(jen.Return())
-	repoTest.Func().Id(testFuncName+"_FindAll").Params(r.createTestingParam()).Block()
-
+	repoTest.Func().Id(testFuncName + "_FindAll").Params(r.createTestingParam()).Block()
 
 	buf := &bytes.Buffer{}
 	err = repo.Render(buf)
@@ -111,7 +110,7 @@ func (r repository) Generate(name string) error {
 	}
 
 	repositoryFileName := "repository/" + fileName + ".go"
-	repositoryTestFileName := "repository/"+testFileName+".go"
+	repositoryTestFileName := "repository/" + testFileName + ".go"
 	err = ioutil.WriteFile(repositoryFileName, buf.Bytes(), 0666)
 	if err != nil {
 		return err
@@ -125,15 +124,14 @@ func (r repository) Generate(name string) error {
 
 	fmt.Println(repositoryTestFileName + " created")
 
-
 	return nil
 }
 
-func (r repository) createContextParam() jen.Code{
+func (r repository) createContextParam() jen.Code {
 	return jen.Id("ctx").Qual("context", "Context")
 }
 
-func (r repository) createTestingParam() jen.Code{
+func (r repository) createTestingParam() jen.Code {
 	return jen.Id("t").Op("*").Qual("testing", "T")
 }
 

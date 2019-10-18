@@ -1,151 +1,33 @@
 package deploy
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"os/exec"
+	"strconv"
 	"strings"
+	"time"
 )
-
-var devList = []string{"dev-a", "dev-b", "dev-c", "dev-d", "dev-e"}
-var beta = "beta"
-var preview = "preview"
-var stable = "stable"
 
 const (
-	deployshell  = "deploy.sh"
-	deployscript = `#!/bin/bash -e
-
-readonly BETA=0
-readonly STABLE=1
-readonly PREVIEW=2
-readonly DEV=3
-readonly V4=4
-readonly MDEV=5
-readonly DEVA=6
-readonly DEVB=7
-readonly SRE=8
-
-generate_version() {
-  format="v$(date +%Y%m%d.%s)"
-  
-  case "$1" in
-    0)
-      version="beta-$format"
-    ;;
-    1)
-      version="stable-$format"
-    ;;
-    2)
-      version="preview-$format"
-    ;;
-    3)
-      version="$2-$format"
-    ;;
-    4)
-      version="v4-$format"
-    ;;
-    5)
-      version="$2-$format"
-    ;;
-    6)
-      version="deva-$format"
-    ;;
-    7)
-      version="devb-$format"
-    ;;
-    8)
-      version="sre-$format"
-    ;;
-  esac
-  
-  echo "Version $version generated."
-}
-
-create_tag() {
-  read tag_description
-  echo Tag description: $tag_description
-
-  git tag -a $version -m "$tag_description"
-}
-
-push_tag() {
-  echo "Pushing version $version to repository..."
-
-  git push origin $version
-
-  echo "Tag $version succesfully pushed to repository."
-}
-
-release_version() {
-  echo "Releasing version $version..."
-
-  generate_version $1
-  create_tag
-  push_tag
-
-  echo "Version release completed."
-}
-
-release_mdev() {
-  echo "Releasing version mdev ... "
-  
-  generate_version $1 $2
-  create_tag
-  push_tag
-}
-
-release_dev() {
-  echo "Releasing version dev ... "
-  
-  generate_version $1 $2
-  create_tag
-  push_tag
-}
-
-while getopts "r:s:t:" option; do
-  case "${option}" in
-    r)
-      release_type=${OPTARG}
-
-      case "$release_type" in
-        beta)
-          release_version $BETA
-        ;;
-        stable)
-          release_version $STABLE
-        ;;
-        preview)
-          release_version $PREVIEW
-        ;;
-        v4)
-          release_version $V4
-        ;;
-        dev-a)
-          release_version $DEVA
-        ;;
-        dev-b)
-          release_version $DEVB
-        ;;
-        sre)
-          release_version $SRE
-        ;;
-      esac
-    ;;
-    s)
-      release_mdev $MDEV $OPTARG
-    ;;
-    t)
-      release_dev $DEV $OPTARG
-    ;;
-  esac
-done
-`
+	//AvailableTarget define to info the command
+	AvailableTarget = "available target, beta,dev-a,dev-b,dev-c,dev-d,dev-e,staging,prod"
 )
+
+var targetMap = map[string]string{
+	"beta":    "beta",
+	"dev-a":   "dev-a",
+	"dev-b":   "dev-a",
+	"dev-c":   "dev-a",
+	"dev-d":   "dev-a",
+	"dev-e":   "dev-a",
+	"staging": "preview",
+	"prod":    "stable",
+}
 
 type (
 	//Deploy define deploy
@@ -160,57 +42,50 @@ func NewDeploy() Deploy {
 	return &deploy{}
 }
 
-//CreateScript to create deploy script
-func CreateScript() {
-	script := []byte(deployscript)
-	err := ioutil.WriteFile(deployshell, script, 0644)
-	if err != nil {
-		_ = os.Remove(deployshell)
-		log.Fatal("fail when create deploy script")
-	}
-}
-
 //
 func (b *deploy) Run(target string) {
-	CreateScript()
-	defer func() {
-		_ = os.Remove(deployshell)
-	}()
-	target, flag, err := checkTarget(target)
+	reader := bufio.NewReader(os.Stdin)
+	target, err := checkTarget(target)
 	if err != nil {
-		_ = os.Remove(deployshell)
-		log.Fatal(`unknown target.
-available target : beta,dev-a,dev-b,dev-c,dev-d,dev-e,preview,stable`)
+		log.Fatal("unknown target. \navailable target : beta,dev-a,dev-b,dev-c,dev-d,dev-e,staging,prod")
 	}
-	cmd := exec.Command("bash", deployshell, flag, target)
-	fmt.Println("Deploying to", target)
-	cmd.Stdin = os.Stdin
-	fmt.Println("Please input tag description:")
-	err = runCommand(cmd)
+
+	tagTime := CreateTagTime()
+	tag := target + "-" + tagTime
+	fmt.Println("Releasing verion to |", target, "|")
+	fmt.Println("Version " + tag)
+	fmt.Println("Please Input Tag Description: ")
+	desc, _ := reader.ReadString('\n')
+	fmt.Print("Tag description: " + desc)
+	fmt.Println("Pushing version", tag, "to repository ...")
+	createTagCmd := exec.Command("git", "tag", "-a", tag, "-m", desc)
+	err = runCommand(createTagCmd)
 	if err != nil {
-		_ = os.Remove(deployshell)
-		log.Fatal("fail when run deploy script, error :", err)
+		log.Fatal(err)
 	}
+	pushTagCmd := exec.Command("git", "push", "origin", tag)
+	err = runCommand(pushTagCmd)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Done push", tag)
+
 }
 
-func checkTarget(target string) (targetResult, flag string, err error) {
-	if strings.Contains(target, "dev") {
-		flag = "-t"
-		for _, value := range devList {
-			if target == value {
-				targetResult = value
-				return
-			}
-			if target == beta {
-				targetResult = target
-				return
-			}
+//CreateTagTime create unique tag time
+func CreateTagTime() string {
+	now := time.Now()
+	second := strconv.Itoa(int(now.UnixNano()))[:10]
+	date := strings.ReplaceAll(now.Format("2006-01-02"), "-", "")
+	return fmt.Sprintf("v%s.%s", date, second)
+}
+
+func checkTarget(target string) (targetResult string, err error) {
+	for key, value := range targetMap {
+		if key == target {
+			targetResult = value
+			return
 		}
-	}
-	if target == preview || target == stable || target == beta {
-		targetResult = target
-		flag = "-r"
-		return
 	}
 	err = errors.New(`unknown target`)
 	return
@@ -221,9 +96,9 @@ func runCommand(cmd *exec.Cmd) error {
 	cmd.Stdout = &outb
 	cmd.Stderr = &errb
 	err := cmd.Run()
-	fmt.Printf("%s\n", outb.String())
 	if err != nil {
 		return err
 	}
+	fmt.Println(outb.String(), errb.String())
 	return nil
 }
