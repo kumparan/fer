@@ -1,5 +1,6 @@
 SHELL:=/bin/bash
 changelog_args=-o CHANGELOG.md -p '^v'
+test_command=go test ./... $(TEST_ARGS) -v --cover
 
 proto:
 	@protoc --go_out=plugins=grpc:. pb/example/*.proto
@@ -34,4 +35,7 @@ endif
 lint:
 	golangci-lint run --print-issued-lines=false --exclude-use-default=false --enable=golint --enable=goimports  --enable=unconvert --enable=unparam --concurrency=2
 
+test:
+	$(test_command)
 
+.PHONY: test lint create-changelog create-version build fetch-git run proto

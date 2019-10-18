@@ -19,4 +19,6 @@ const (
 	ProtobufLinuxInstallerURL = "https://github.com/protocolbuffers/protobuf/releases/download/v3.7.1/protoc-3.7.1-linux-x86_64.zip"
 	// ProtocZipFileName :nodoc:
 	ProtocZipFileName = "protobuf.zip"
+	//APIFerGithubReleaseURL :nodoc:
+	APIFerGithubReleaseURL = "https://api.github.com/repos/kumparan/fer/releases"
 )
