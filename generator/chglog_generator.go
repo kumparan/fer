@@ -59,7 +59,6 @@ func InitChangelog(style, repositoryURL string) {
 		os.Exit(1)
 	}
 
-	// message := []byte("Hello, Gophers!")
 	err = ioutil.WriteFile(".chglog/config.yml", []byte(installer.CreateChangelogYAML(style, repositoryURL)), 0644)
 	if err != nil {
 		installer.ProgressBar(1)
@@ -82,7 +81,7 @@ func InitChangelog(style, repositoryURL string) {
 
 //CreateChangelog :nodoc:
 func CreateChangelog(version string){
-	fmt.Println("Create CHANGELOG.md file")
+	fmt.Println("Creating CHANGELOG.md file")
 	getWorkingDirectory, err := exec.Command("pwd").Output()
 	if err != nil {
 		installer.ProgressBar(1)

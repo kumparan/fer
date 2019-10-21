@@ -26,13 +26,13 @@ var generateInitChglogCmd = &cobra.Command{
 	Short: "Generate the changelog configuration file",
 	Long:  "This subcommand to generate changelog ",
 	Args:  cobra.ExactArgs(1),
-	Run:   generateInitChglog,
+	Run:   initChglog,
 }
 
-func generateInitChglog(cmd *cobra.Command, args []string) {
+func initChglog(cmd *cobra.Command, args []string) {
 	style, err := cmd.Flags().GetString("style")
 	if err != nil {
-		log.Fatal("fail retreive --style flag")
+		log.Fatal("fail retrieve --style flag")
 	}
 	if args[0] == "" {
 		fmt.Println("please input repository URL 'fer generate chglog <style> <url>' ")
@@ -62,6 +62,6 @@ func createChglogMDFile(cmd *cobra.Command, args []string) {
 		version := args[0]
 		generator.CreateChangelog(version)
 	}
-	fmt.Println("error version is not set")
+	fmt.Println("error, version is not set")
 }
 
