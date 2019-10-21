@@ -62,6 +62,10 @@ func createChglogMDFile(cmd *cobra.Command, args []string) {
 		version := args[0]
 		generator.CreateChangelog(version)
 	}
+<<<<<<< HEAD
 	fmt.Println("error, version is not set")
+=======
+	fmt.Println("error version is not set")
+>>>>>>> 0d8984088d14fd970665ec1acb7e3c22c3fb341b
 }
 

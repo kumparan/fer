@@ -80,7 +80,7 @@ func InitChangelog(style, repositoryURL string) {
 }
 
 //CreateChangelog :nodoc:
-func CreateChangelog(version string){
+func CreateChangelog(version string) {
 	fmt.Println("Creating CHANGELOG.md file")
 	getWorkingDirectory, err := exec.Command("pwd").Output()
 	if err != nil {
