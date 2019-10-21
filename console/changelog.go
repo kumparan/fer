@@ -18,7 +18,7 @@ func init() {
 var initCmd = &cobra.Command{
 	Use:   "init",
 	Short: "a initialization",
-	Long: `initialization configuration, example 'fer init [command]'`,
+	Long:  `initialization configuration, example 'fer init [command]'`,
 }
 
 var generateInitChglogCmd = &cobra.Command{
@@ -41,12 +41,11 @@ func initChglog(cmd *cobra.Command, args []string) {
 	generator.InitChangelog(style, url)
 }
 
-
 // initCmd represents the create command
 var createCmd = &cobra.Command{
 	Use:   "create",
 	Short: "a create",
-	Long: `created generate file, example 'fer create [command]'`,
+	Long:  `created generate file, example 'fer create [command]'`,
 }
 
 var createChglogCmd = &cobra.Command{
@@ -62,10 +61,5 @@ func createChglogMDFile(cmd *cobra.Command, args []string) {
 		version := args[0]
 		generator.CreateChangelog(version)
 	}
-<<<<<<< HEAD
 	fmt.Println("error, version is not set")
-=======
-	fmt.Println("error version is not set")
->>>>>>> 0d8984088d14fd970665ec1acb7e3c22c3fb341b
 }
-
