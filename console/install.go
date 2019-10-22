@@ -1,8 +1,7 @@
 package console
 
 import (
-	"fmt"
-	"strings"
+	"os"
 
 	"github.com/kumparan/fer/config"
 	"github.com/kumparan/fer/installer"
@@ -10,119 +9,151 @@ import (
 )
 
 var installCmd = &cobra.Command{
-	Use:   "install",
-	Short: "install all dependencies",
-	Long:  "install all dependencies for contributing to backend projects",
-	Run:   installAllCmd,
+	Use: "install",
+	Short: "install dependencies for your project",
+	Long: "install what do you need for backend contributed",
 }
 
-func installAllCmd(_ *cobra.Command, _ []string) {
-	installAll()
-}
-
-func installAll() {
-	installer.CheckExistenceOfGolang()
-	installer.CheckGolangVersion()
-	var messages = []string{}
-
-	message := installer.InstallGoUtils("protoc-gen-go", config.ProtobufInstallerURL)
-	messages = append(messages, message)
-
-	message = installer.InstallGoUtils("mockgen", config.MockgenInstallerURL)
-	messages = append(messages, message)
-
-	message = installer.InstallGoUtils("richgo", config.RichgoInstallerURL)
-	messages = append(messages, message)
-
-	message = installer.InstallGoUtils("golint", config.GolintInstallerURL)
-	messages = append(messages, message)
-
-	message = installer.InstallGoUtils("git-chglog", config.ChangeLogInstallerURL)
-	messages = append(messages, message)
-
-	message = installer.CheckedInstallerPath("make")
-	messages = append(messages, message)
-
-	message = installer.InstallWatchmedo()
-	messages = append(messages, message)
-
-	message = installer.ProtobufInstaller()
-	messages = append(messages, message)
-	fmt.Printf("%s", strings.Join(messages, "/n"))
-
-}
-
-func init() {
+func init(){
+	installCmd.AddCommand(installAllCmd)
 	installCmd.AddCommand(goUtilsCmd)
+	installCmd.AddCommand(protocGenCmd)
+	installCmd.AddCommand(mockgenCmd)
+	installCmd.AddCommand(richgoCmd)
+	installCmd.AddCommand(golintCmd)
+	installCmd.AddCommand(chglogCmd)
 	installCmd.AddCommand(watchmedoCmd)
 	installCmd.AddCommand(protobufCmd)
-	rootCmd.AddCommand(installCmd)
+}
+
+var installAllCmd = &cobra.Command{
+	Use: "all",
+	Short: "This subcommand to install all dependencies",
+	Long:  "install all dependencies for contributing to backend projects",
+	Run:   installAll,
+}
+
+func installAll(_ *cobra.Command, _ []string) {
+	installer.CheckExistenceOfGolang()
+	installer.CheckGolangVersion()
+	installer.InstallGoUtils("protoc-gen-go", config.ProtobufInstallerURL)
+	installer.InstallGoUtils("mockgen", config.MockgenInstallerURL)
+	installer.InstallGoUtils("richgo", config.RichgoInstallerURL)
+	installer.InstallGoUtils("golint", config.GolintInstallerURL)
+	installer.InstallGoUtils("git-chglog", config.ChangeLogInstallerURL)
+	installer.InstallWatchmedo()
+	installer.ProtobufInstaller()
+	os.Exit(0)
 }
 
 var goUtilsCmd = &cobra.Command{
 	Use:   "goutils",
-	Short: "fer install goutils",
-	Long:  "This subcommand to install git go utils ",
+	Short: "This subcommand to install all go utils",
+	Long:  "To install all goutils, your golang version must %s or latest",
 	Run:   installGoUtilsCmd,
 }
 
 func installGoUtilsCmd(_ *cobra.Command, _ []string) {
-	installGoUtils()
-}
-
-func installGoUtils() {
 	installer.CheckExistenceOfGolang()
 	installer.CheckGolangVersion()
-	var messages = []string{}
-	message := installer.InstallGoUtils("protoc-gen-go", config.ProtobufInstallerURL)
-	messages = append(messages, message)
+	installer.InstallGoUtils("protoc-gen-go", config.ProtobufInstallerURL)
+	installer.InstallGoUtils("mockgen", config.MockgenInstallerURL)
+	installer.InstallGoUtils("richgo", config.RichgoInstallerURL)
+	installer.InstallGoUtils("golint", config.GolintInstallerURL)
+	installer.InstallGoUtils("git-chglog", config.ChangeLogInstallerURL)
+	os.Exit(0)
+}
 
-	message = installer.InstallGoUtils("mockgen", config.MockgenInstallerURL)
-	messages = append(messages, message)
+var protocGenCmd = &cobra.Command{
+	Use:   "protoc-gen",
+	Short: "This subcommand to install protoc generator",
+	Long:  "Go version must be " +config.GoVersion+ " or latest",
+	Run:   installProtocGenCmd,
+}
 
-	message = installer.InstallGoUtils("richgo", config.RichgoInstallerURL)
-	messages = append(messages, message)
+func installProtocGenCmd(_ *cobra.Command, _ []string) {
+	installer.CheckExistenceOfGolang()
+	installer.CheckGolangVersion()
+	installer.InstallGoUtils("protoc-gen-go", config.ProtobufInstallerURL)
+	os.Exit(0)
+}
 
-	message = installer.InstallGoUtils("golint", config.GolintInstallerURL)
-	messages = append(messages, message)
+var mockgenCmd = &cobra.Command{
+	Use:   "mockgen",
+	Short: "This subcommand to install mock generator",
+	Long:  "GoMock is a mocking framework for the Go programming language. It integrates well with Go's built-in testing package, but can be used in other contexts too.",
+	Run:   installMockgenCmd,
+}
 
-	message = installer.InstallGoUtils("git-chglog", config.ChangeLogInstallerURL)
-	messages = append(messages, message)
+func installMockgenCmd(_ *cobra.Command, _ []string) {
+	installer.CheckExistenceOfGolang()
+	installer.CheckGolangVersion()
+	installer.InstallGoUtils("mockgen", config.MockgenInstallerURL)
+	os.Exit(0)
+}
 
-	message = installer.CheckedInstallerPath("make")
-	messages = append(messages, message)
+var richgoCmd = &cobra.Command{
+	Use:   "richgo",
+	Short: "This subcommand to install richgo",
+	Long:  "Rich-Go will enrich go test outputs with text decorations.",
+	Run:   installRichgoCmd,
+}
 
-	fmt.Printf("%s", strings.Join(messages, "/n"))
+func installRichgoCmd(_ *cobra.Command, _ []string) {
+	installer.CheckExistenceOfGolang()
+	installer.CheckGolangVersion()
+	installer.InstallGoUtils("richgo", config.MockgenInstallerURL)
+	os.Exit(0)
+}
+
+var golintCmd = &cobra.Command{
+	Use:   "golint",
+	Short: "This subcommand to install GolangCI-Lint",
+	Long:  "GolangCI-Lint is a linters aggregator. It's easy to integrate and use, has nice output and has a minimum number of false positives. It supports go modules.",
+	Run:   installGolintCmd,
+}
+
+func installGolintCmd(_ *cobra.Command, _ []string) {
+	installer.CheckExistenceOfGolang()
+	installer.CheckGolangVersion()
+	installer.InstallGoUtils("golint", config.MockgenInstallerURL)
+	os.Exit(0)
+}
+
+var chglogCmd = &cobra.Command{
+	Use:   "git-chglog",
+	Short: "This subcommand to install git-changelog",
+	Long:  "Changelog generator implemented in Go (Golang)",
+	Run:   installChglogCmd,
+}
+
+func installChglogCmd(_ *cobra.Command, _ []string) {
+	installer.CheckExistenceOfGolang()
+	installer.CheckGolangVersion()
+	installer.InstallGoUtils("git-chglog", config.MockgenInstallerURL)
+	os.Exit(0)
 }
 
 var watchmedoCmd = &cobra.Command{
 	Use:   "watchmedo",
-	Short: "fer install watchmedo",
-	Long:  "This subcommand to install watchmedo",
+	Short: "This subcommand to install watchmedo",
+	Long:  "Watchdog comes with an optional utility script called watchmedo.",
 	Run:   installWatchmedoCmd,
 }
 
 func installWatchmedoCmd(cmd *cobra.Command, args []string) {
-	installWatchmedo()
-}
-
-func installWatchmedo() {
-	message := installer.InstallWatchmedo()
-	fmt.Println(message)
+	installer.InstallWatchmedo()
+	os.Exit(0)
 }
 
 var protobufCmd = &cobra.Command{
 	Use:   "protobuf",
-	Short: "fer install protobuf",
-	Long:  "This subcommand to install protobuf",
+	Short: "This subcommand to install protobuf",
+	Long:  "Protocol Buffers (a.k.a., protobuf) are Google's language-neutral, platform-neutral, extensible mechanism for serializing structured data.",
 	Run:   installProtobufCmd,
 }
 
 func installProtobufCmd(cmd *cobra.Command, args []string) {
-	installProtobuf()
-}
-
-func installProtobuf() {
-	message := installer.ProtobufInstaller()
-	fmt.Println(message)
+	installer.ProtobufInstaller()
+	os.Exit(0)
 }

@@ -11,6 +11,9 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
+
+	pb "github.com/cheggaaa/pb/v3"
 
 	"github.com/kumparan/fer/config"
 
@@ -136,4 +139,104 @@ func Unzip(src string, dest string) ([]string, error) {
 		}
 	}
 	return filenames, nil
+}
+
+// ProgressBar :nodoc:
+func ProgressBar(stopProgress int) {
+	count := stopProgress
+
+	// start bar from 'full' template
+	bar := pb.Full.Start(100)
+
+	for i := 0; i < count; i++ {
+		bar.Increment()
+		time.Sleep(time.Millisecond * 100)
+	}
+	bar.Finish()
+}
+
+// CreateChangelogYAML :nodoc:
+func CreateChangelogYAML(style, repositoryURL string) string {
+	var configurationText = `style: ` + style + `
+	template: CHANGELOG.tpl.md
+	info:
+	  title: CHANGELOG
+	  repository_url:` + repositoryURL + `
+	options:
+	  commits:
+		 filters:
+		   Type:
+			 - feature
+			 - bugfix
+			 - hotfix
+			 - refactor
+			 - test
+			 - misc
+	  commit_groups:
+		 title_maps:
+		   feature: New Features
+		   bugfix: Fixes
+		   hotfix: Fixes
+		   refactor: Code Improvements
+		   test: Test Improvements
+		   misc: Other Improvements
+	  header:
+		pattern: "^(\\w*)\\:\\s(.*)$"
+		pattern_maps:
+		  - Type
+		  - Subject
+	  notes:
+		keywords:
+		  - BREAKING CHANGE
+	`
+
+	return configurationText
+}
+
+// CreateChangelogMD :nodoc:
+func CreateChangelogMD() string {
+	var changelogmd = `{{ if .Versions -}}
+
+{{ if .Unreleased.CommitGroups -}}
+{{ range .Unreleased.CommitGroups -}}
+### {{ .Title }}
+{{ range .Commits -}}
+- {{ if .Scope }}**{{ .Scope }}:** {{ end }}{{ .Subject }}
+{{ end }}
+{{ end -}}
+{{ end -}}
+{{ end -}}
+
+{{ range .Versions }}
+<a name="{{ .Tag.Name }}"></a>
+## {{ if .Tag.Previous }}[{{ .Tag.Name }}]{{ else }}{{ .Tag.Name }}{{ end }} - {{ datetime "2006-01-02" .Tag.Date }}
+{{ range .CommitGroups -}}
+### {{ .Title }}
+{{ range .Commits -}}
+- {{ if .Scope }}**{{ .Scope }}:** {{ end }}{{ .Subject }}
+{{ end }}
+{{ end -}}
+
+{{- if .NoteGroups -}}
+{{ range .NoteGroups -}}
+### {{ .Title }}
+{{ range .Notes }}
+{{ .Body }}
+{{ end }}
+{{ end -}}
+{{ end -}}
+{{ end -}}
+
+{{- if .Versions }}
+[Unreleased]: {{ .Info.RepositoryURL }}/compare/{{ $latest := index .Versions 0 }}{{ $latest.Tag.Name }}...HEAD
+{{ range .Versions -}}
+{{ if .Tag.Previous -}}
+[{{ .Tag.Name }}]: {{ $.Info.RepositoryURL }}/compare/{{ .Tag.Previous.Name }}...{{ .Tag.Name }}
+{{ end -}}
+{{ end -}}
+{{ end -}}
+`
+
+	return changelogmd
+
 }
