@@ -1,9 +1,13 @@
 #Fer 
 
 <a name="v1.1.0"></a>
-## [v1.1.0] - 2019-10-18
+## [v1.1.0] - 2019-10-21
 ### New Features
+- add ini and generate chglog
 - add command to push deploy tag ([#7](https://github.com/kumparan/fer/issues/7))
+- add init and generate chglog
+- add ini and generate chglog
+- add ini and generate chglog
 
 
 <a name="v1.0.1"></a>
