@@ -1,5 +1,11 @@
 #Fer 
 
+<a name="v1.2.1"></a>
+## [v1.2.1] - 2019-10-25
+### Fixes
+- fix fer deploy ([#9](https://github.com/kumparan/fer/issues/9))
+
+
 <a name="v1.2.0"></a>
 ## [v1.2.0] - 2019-10-22
 ### New Features
@@ -26,7 +32,8 @@
 - db migrationfile generator ([#3](https://github.com/kumparan/fer/issues/3))
 
 
-[Unreleased]: https://github.com/kumparan/fer/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/kumparan/fer/compare/v1.2.1...HEAD
+[v1.2.1]: https://github.com/kumparan/fer/compare/v1.2.0...v1.2.1
 [v1.2.0]: https://github.com/kumparan/fer/compare/v1.1.0...v1.2.0
 [v1.1.0]: https://github.com/kumparan/fer/compare/v1.0.1...v1.1.0
 [v1.0.1]: https://github.com/kumparan/fer/compare/v1.0.0...v1.0.1
