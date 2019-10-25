@@ -21,10 +21,10 @@ const (
 var targetMap = map[string]string{
 	"dev":     "beta",
 	"dev-a":   "dev-a",
-	"dev-b":   "dev-a",
-	"dev-c":   "dev-a",
-	"dev-d":   "dev-a",
-	"dev-e":   "dev-a",
+	"dev-b":   "dev-b",
+	"dev-c":   "dev-c",
+	"dev-d":   "dev-d",
+	"dev-e":   "dev-e",
 	"staging": "preview",
 	"prod":    "stable",
 }
