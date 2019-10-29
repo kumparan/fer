@@ -1,6 +1,11 @@
 SHELL:=/bin/bash
+
+ifdef test_run
+        TEST_ARGS := -run $(test_run)
+endif
+
 changelog_args=-o CHANGELOG.md -p '^v'
-test_command=go test ./... $(TEST_ARGS) -v --cover
+test_command=richgo test ./... $(TEST_ARGS) -v --cover
 
 proto:
 	@protoc --go_out=plugins=grpc:. pb/example/*.proto

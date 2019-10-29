@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 
 	"github.com/kumparan/fer/config"
@@ -14,7 +15,7 @@ import (
 var (
 	errorDownload   = "fail downloaded protobuf"
 	errorUnzip      = "fail unzip protobuf"
-	errorInstall    = "fail installeded protobuf"
+	errorInstall    = "fail installing protobuf"
 	successDownload = "success downloaded protobuf"
 )
 
@@ -29,7 +30,7 @@ func protobufDownloadInstaller() (filePath, message string) {
 	if runtime.GOOS == "darwin" {
 		downloadURL = config.ProtobufOSXInstallerURL
 	}
-	err = DownloadFile(tmp+"/"+config.ProtocZipFileName, downloadURL)
+	err = DownloadFile(filepath.Join(tmp, config.ProtocZipFileName), downloadURL)
 	if err != nil {
 		fmt.Println(err)
 		return "", errorDownload
@@ -44,7 +45,7 @@ func ProtobufInstaller() {
 	fmt.Println("Installing protobuf")
 	tmp, message := protobufDownloadInstaller()
 	protobufZipFile := config.ProtocZipFileName
-	filePath := tmp + "/" + protobufZipFile
+	filePath := filepath.Join(tmp, protobufZipFile)
 	if runtime.GOOS == "darwin" {
 		protobufZipFile = config.ProtocZipFileName
 	}
@@ -53,7 +54,6 @@ func ProtobufInstaller() {
 		_, err := Unzip(filePath, "/usr/local/bin/")
 		if err != nil {
 			ProgressBar(1)
-			log.Fatal(err)
 			fmt.Println(errorUnzip)
 			os.Exit(1)
 		}
@@ -61,7 +61,6 @@ func ProtobufInstaller() {
 		_, err = Unzip(filePath, "include/*")
 		if err != nil {
 			ProgressBar(1)
-			log.Fatal(err)
 			fmt.Println(errorUnzip)
 			os.Exit(1)
 		}
@@ -70,7 +69,6 @@ func ProtobufInstaller() {
 		err = cmdRemoveProtocZip.Run()
 		if err != nil {
 			ProgressBar(1)
-			log.Fatal(err)
 			fmt.Println(errorUnzip)
 			os.Exit(1)
 		}

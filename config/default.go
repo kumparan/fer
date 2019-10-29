@@ -1,5 +1,9 @@
 package config
 
+import (
+	"time"
+)
+
 const (
 	// GoVersion :nodoc:
 	GoVersion = "1.12.7"
@@ -13,12 +17,21 @@ const (
 	RichgoInstallerURL = "github.com/kyoh86/richgo"
 	// GolintInstallerURL :nodoc:
 	GolintInstallerURL = "github.com/golangci/golangci-lint/cmd/golangci-lint"
+	ProtobufVersion    = "3.7.1"
 	// ProtobufOSXInstallerURL :nodoc:
 	ProtobufOSXInstallerURL = "https://github.com/protocolbuffers/protobuf/releases/download/v3.7.1/protoc-3.7.1-osx-x86_64.zip"
 	// ProtobufLinuxInstallerURL :nodoc:
 	ProtobufLinuxInstallerURL = "https://github.com/protocolbuffers/protobuf/releases/download/v3.7.1/protoc-3.7.1-linux-x86_64.zip"
 	// ProtocZipFileName :nodoc:
 	ProtocZipFileName = "protobuf.zip"
-	//APIFerGithubReleaseURL :nodoc:
-	APIFerGithubReleaseURL = "https://api.github.com/repos/kumparan/fer/releases"
+	// ReleaseURL :nodoc:
+	ReleaseURL = "https://api.github.com/repos/kumparan/fer/releases"
+	// CacheDirPerm :nodoc:
+	CacheDirPerm = 0755
+	// CacheTTLFerVersion :nodoc:
+	CacheTTLFerVersion = 2 * time.Hour
+	// ConfigDir :nodoc:
+	ConfigDir = ".config/fer"
+	// TempDirPrefix :nodoc:
+	TempDirPrefix = "fer-"
 )

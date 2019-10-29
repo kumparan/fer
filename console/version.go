@@ -1,18 +1,19 @@
 package console
 
 import (
-	"bytes"
 	"encoding/json"
-	"io/ioutil"
-	"net/http"
 	"fmt"
-	"gopkg.in/djherbis/fscache.v0"
-	"io"
-	"log"
-	"time"
-
+	"github.com/blang/semver"
+	"github.com/kumparan/fer/cache"
 	"github.com/kumparan/fer/config"
 	"github.com/spf13/cobra"
+	"io/ioutil"
+	"net/http"
+	"path/filepath"
+)
+
+const (
+	lastVerCacheKey = "last_version_cache_key"
 )
 
 var versionCmd = &cobra.Command{
@@ -27,54 +28,74 @@ func printVersion(cmd *cobra.Command, args []string) {
 }
 
 type githubRelease struct {
-	TagName            string  `json:"tag_name"`
+	TagName string `json:"tag_name"`
 }
 
-//getGithubReleaseLatest
-func getGithubReleaseLatest() (string) {
-	c, err := fscache.New(".cache-version", 0755, 2*time.Hour)
-	if err != nil{
-		log.Fatal(err.Error())
-	}
-
-	r, w, err := c.Get("last_version")
+func getFerLatestVersion() (ver string, err error) {
+	resp, err := http.Get(config.ReleaseURL)
 	if err != nil {
-		log.Fatal(err)
+		return
 	}
-
-	if w == nil {
-		buf := new(bytes.Buffer)
-		io.Copy(buf, r)
-		r.Close()
-		ver := buf.String()
-		return ver
-	}
-
-	resp, err := http.Get(config.APIFerGithubReleaseURL)
-	if err != nil{
-		return ""
-	}
-	defer resp.Body.Close()
-
+	defer func() {
+		_ = resp.Body.Close()
+	}()
 	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil{
-		return ""
+	if err != nil {
+		return
+	}
+	var jsonData []githubRelease
+	err = json.Unmarshal([]byte(body), &jsonData)
+	if err != nil {
+		return
+	}
+	ver = jsonData[0].TagName
+	return
+}
+
+//getFerLatestVersionCached
+func getFerLatestVersionCached() (ver string, err error) {
+	pathDir := filepath.Join(GetConfigDir(), "cache")
+	c, err := cache.New(pathDir)
+	if err != nil {
+		return
 	}
 
-	var jsonData []githubRelease
-	err = json.Unmarshal([]byte(body), &jsonData) // here!
+	v, err := c.GetOrSetFunc(lastVerCacheKey, func() (interface{}, error) {
+		latestVer, err2 := getFerLatestVersion()
+		if err2 != nil {
+			return nil, err2
+		}
+		latestVerB := []byte(latestVer)
+		return latestVerB, nil
+	})
+
 	if err != nil {
-		fmt.Println("error unmarshal")
-		return ""
+		return
 	}
-	var version = jsonData[0].TagName
-	w.Write([]byte(version))
-	w.Close()
-	return version
+
+	if ver, ok := v.([]byte); ok {
+		return string(ver), nil
+	}
+
+	return "", fmt.Errorf("unable to parse version from cache: %v", v)
 }
 
 func checkVersion() {
-	if getGithubReleaseLatest() != config.Version{
-		fmt.Println("your fer is out of date, please updated your fer")
+	latestVer, err := getFerLatestVersionCached()
+	if err != nil {
+		PrintWarn("Error getting latest version: %s\n", err.Error())
+	}
+	currentVersion, err := semver.Make(config.Version[1:])
+	if err != nil {
+		PrintWarn("Error parsing current version: %s\n", err.Error())
+		return
+	}
+	latestVersion, err := semver.Make(latestVer[1:])
+	if err != nil {
+		PrintWarn("Error parsing latest version: %s\n", err.Error())
+	}
+
+	if currentVersion.LT(latestVersion) {
+		PrintWarn("Your installed fer is out of date (%s), please update to the latest version: %s!\n", config.Version, latestVer)
 	}
 }

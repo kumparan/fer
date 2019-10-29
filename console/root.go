@@ -1,7 +1,6 @@
 package console
 
 import (
-	"fmt"
 	"github.com/spf13/cobra"
 	"os"
 )
@@ -26,7 +25,6 @@ fer can help whatever you want.
 func Execute() {
 	checkVersion()
 	if err := rootCmd.Execute(); err != nil {
-		fmt.Println(err)
 		os.Exit(1)
 	}
 }
