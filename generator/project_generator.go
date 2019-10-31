@@ -128,6 +128,7 @@ func (g project) GetTemplates(serviceName string) {
 	git fetch;	
 	git pull origin master;
 	rm -rf .git;
+	rm -rf worker;
 	cd ..;
 `
 	bt := []byte(contents)
