@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"log"
 
+	"path/filepath"
+
 	"github.com/kumparan/fer/util"
 
 	"os"
@@ -92,7 +94,10 @@ func (g project) Run(serviceName string, protoPath string) {
 	}
 	g.CreateScaffoldScript()
 	g.RunScaffold(serviceName)
-	g.changeServiceNameOnMakefile(serviceName)
+	err = g.changeServiceNameOnMakefile(serviceName)
+	if err != nil {
+		g.rollbackWhenError("fail generate makefile " + err.Error())
+	}
 	fmt.Println(serviceName, "Created")
 }
 
@@ -207,7 +212,7 @@ func (g project) rollbackWhenError(message string) {
 }
 
 func (g project) changeServiceNameOnMakefile(serviceName string) error {
-	makefilePath := serviceName + "/Makefile"
+	makefilePath := filepath.Join(serviceName + "/Makefile")
 	data, err := ioutil.ReadFile(makefilePath)
 	if err != nil {
 		return err
