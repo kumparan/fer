@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-
 	"path/filepath"
 
 	"github.com/kumparan/fer/util"
@@ -69,13 +68,9 @@ func (g project) Run(serviceName string, protoPath string) {
 		protoPath = strings.ReplaceAll(protoPath, "proto", "pb.go")
 		fmt.Println("RPC Path : ", protoPath)
 		g.protoFile = protoPath
-		err = os.Mkdir(serviceName+"/"+g.getProtoFolder(protoPath), os.ModePerm)
+		err = util.CopyFolder(g.getProtoFolder(protoPath)+"/", serviceName+"/"+"/"+g.getProtoFolder(protoPath)+"/")
 		if err != nil {
-			g.rollbackWhenError("fail to create dir " + serviceName + "/" + g.getProtoFolder(protoPath))
-		}
-		err = util.CopyFolder(g.getProtoFolder(protoPath)+"/", serviceName+"/"+protoPath+"/")
-		if err != nil {
-			g.rollbackWhenError("fail to create dir " + g.getProtoFolder(protoPath) + "/" + serviceName + "/" + protoPath + "/")
+			g.rollbackWhenError("fail to create dir " + serviceName + "/" + "/" + g.getProtoFolder(protoPath) + "/")
 		}
 		g.client = NewRPCClientGenerator(g.protoFile, serviceName, serviceURL)
 		g.service = NewServiceGenerator(serviceName, serviceURL, g.protoFile)
@@ -97,6 +92,14 @@ func (g project) Run(serviceName string, protoPath string) {
 	err = g.changeServiceNameOnMakefile(serviceName)
 	if err != nil {
 		g.rollbackWhenError("fail generate makefile " + err.Error())
+	}
+	err = g.removeWorker(serviceName)
+	if err != nil {
+		g.rollbackWhenError("fail to remove worker " + err.Error())
+	}
+	err = g.removeHello(serviceName)
+	if err != nil {
+		g.rollbackWhenError("fail to remove example files " + err.Error())
 	}
 	fmt.Println(serviceName, "Created")
 }
@@ -128,7 +131,6 @@ func (g project) GetTemplates(serviceName string) {
 	git fetch;	
 	git pull origin master;
 	rm -rf .git;
-	rm -rf worker;
 	cd ..;
 `
 	bt := []byte(contents)
@@ -228,6 +230,63 @@ func (g project) changeServiceNameOnMakefile(serviceName string) error {
 	_, err = file.WriteString(newMakefile)
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func (g project) removeHello(serviceName string) (err error) {
+	err = os.Remove(filepath.Join(serviceName + "/service/hello_service_impl.go"))
+	err = os.Remove(filepath.Join(serviceName + "/service/hello_service_impl_test.go"))
+	err = os.Remove(filepath.Join(serviceName + "/repository/hello_repository_test.go"))
+	err = os.Remove(filepath.Join(serviceName + "/repository/hello_repository_test.go"))
+	err = os.Remove(filepath.Join(serviceName + "/repository/model/greeting.go"))
+	err = os.RemoveAll(filepath.Join(serviceName + "/pb/skeleton"))
+	return
+}
+
+func (g project) removeWorker(serviceName string) error {
+	os.RemoveAll(filepath.Join(serviceName + "/worker"))
+	os.RemoveAll(filepath.Join(serviceName + "/event"))
+	os.Remove(filepath.Join(serviceName + "/service/service.go"))
+	contents := `package service
+
+import (
+	"github.com/kumparan/go-lib/redcachekeeper"
+	"github.com/kumparan/kumnats"
+)
+
+// Service :nodoc:
+type Service struct {
+	nats        kumnats.NATS
+	cacheKeeper redcachekeeper.Keeper
+}
+
+// RegisterNATS :nodoc:
+func (s *Service) RegisterNATS(n kumnats.NATS) {
+	s.nats = n
+}
+
+// GetNATS :nodoc:
+func (s *Service) GetNATS() kumnats.NATS {
+	return s.nats
+}
+
+// NewSkeletonService :nodoc:
+func NewSkeletonService() *Service {
+	return new(Service)
+}
+
+
+// RegisterCacheKeeper :nodoc:
+func (s *Service) RegisterCacheKeeper(k redcachekeeper.Keeper) {
+	s.cacheKeeper = k
+}
+	`
+	contents = strings.Replace(contents, "Skeleton", serviceName, -1)
+	bt := []byte(contents)
+	err := ioutil.WriteFile(filepath.Join(serviceName+"/service/service.go"), bt, 0644)
+	if err != nil {
+		g.rollbackWhenError("fail to write service")
 	}
 	return nil
 }
