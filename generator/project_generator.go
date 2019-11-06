@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"path/filepath"
+	"path"
 
 	"github.com/kumparan/fer/util"
 
@@ -13,6 +13,8 @@ import (
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/iancoleman/strcase"
 )
 
 const (
@@ -50,7 +52,7 @@ func (g project) Run(serviceName string, protoPath string) {
 	if err != nil {
 		log.Fatal("folder " + serviceName + " already exist")
 	}
-	err = os.Mkdir(serviceName+"/client", os.ModePerm)
+	err = os.Mkdir(path.Join(serviceName, "client"), os.ModePerm)
 	if err != nil {
 		g.rollbackWhenError("fail create client folder inside " + serviceName)
 	}
@@ -68,9 +70,9 @@ func (g project) Run(serviceName string, protoPath string) {
 		protoPath = strings.ReplaceAll(protoPath, "proto", "pb.go")
 		fmt.Println("RPC Path : ", protoPath)
 		g.protoFile = protoPath
-		err = util.CopyFolder(g.getProtoFolder(protoPath)+"/", serviceName+"/"+"/"+g.getProtoFolder(protoPath)+"/")
+		err = util.CopyFolder(g.getProtoFolder(protoPath)+"/", path.Join(serviceName, g.getProtoFolder(protoPath)))
 		if err != nil {
-			g.rollbackWhenError("fail to create dir " + serviceName + "/" + "/" + g.getProtoFolder(protoPath) + "/")
+			g.rollbackWhenError("fail to create dir " + path.Join(serviceName, g.getProtoFolder(protoPath)))
 		}
 		g.client = NewRPCClientGenerator(g.protoFile, serviceName, serviceURL)
 		g.service = NewServiceGenerator(serviceName, serviceURL, g.protoFile)
@@ -100,6 +102,10 @@ func (g project) Run(serviceName string, protoPath string) {
 	err = g.removeHello(serviceName)
 	if err != nil {
 		g.rollbackWhenError("fail to remove example files " + err.Error())
+	}
+	err = g.generateClient(serviceName)
+	if err != nil {
+		g.rollbackWhenError("fail to remove worker " + err.Error())
 	}
 	fmt.Println(serviceName, "Created")
 }
@@ -235,19 +241,20 @@ func (g project) changeServiceNameOnMakefile(serviceName string) error {
 }
 
 func (g project) removeHello(serviceName string) (err error) {
-	err = os.Remove(filepath.Join(serviceName + "/service/hello_service_impl.go"))
-	err = os.Remove(filepath.Join(serviceName + "/service/hello_service_impl_test.go"))
-	err = os.Remove(filepath.Join(serviceName + "/repository/hello_repository_test.go"))
-	err = os.Remove(filepath.Join(serviceName + "/repository/hello_repository_test.go"))
-	err = os.Remove(filepath.Join(serviceName + "/repository/model/greeting.go"))
-	err = os.RemoveAll(filepath.Join(serviceName + "/pb/skeleton"))
+	err = os.Remove(path.Join(serviceName, "service", "hello_service_impl.go"))
+	err = os.Remove(path.Join(serviceName, "service", "hello_service_impl_test.go"))
+	err = os.Remove(path.Join(serviceName, "repository", "hello_repository_test.go"))
+	err = os.Remove(path.Join(serviceName, "repository", "hello_repository.go"))
+	err = os.Remove(path.Join(serviceName, "repository", "model/greeting.go"))
+	err = os.RemoveAll(path.Join(serviceName, "pb", "skeleton"))
 	return
 }
 
 func (g project) removeWorker(serviceName string) error {
-	os.RemoveAll(filepath.Join(serviceName + "/worker"))
-	os.RemoveAll(filepath.Join(serviceName + "/event"))
-	os.Remove(filepath.Join(serviceName + "/service/service.go"))
+	os.RemoveAll(path.Join(serviceName, "worker"))
+	os.RemoveAll(path.Join(serviceName, "event"))
+	os.Remove(path.Join(serviceName, "service", "service.go"))
+	os.Remove(path.Join(serviceName, "console", "worker.go"))
 	contents := `package service
 
 import (
@@ -284,9 +291,80 @@ func (s *Service) RegisterCacheKeeper(k redcachekeeper.Keeper) {
 	`
 	contents = strings.Replace(contents, "Skeleton", serviceName, -1)
 	bt := []byte(contents)
-	err := ioutil.WriteFile(filepath.Join(serviceName+"/service/service.go"), bt, 0644)
+	err := ioutil.WriteFile(path.Join(serviceName, "service", "service.go"), bt, 0644)
 	if err != nil {
 		g.rollbackWhenError("fail to write service")
+	}
+	return nil
+}
+
+func (g project) generateClient(serviceName string) error {
+	os.Remove(path.Join(serviceName, "client", "client.go"))
+	contents := `package client
+	
+	import (
+		"context"
+		"time"
+	
+		grpcpool "github.com/processout/grpc-go-pool"
+		log "github.com/sirupsen/logrus"
+		"google.golang.org/grpc"
+	)
+	
+	type client struct {
+		Conn *grpcpool.Pool
+	}
+	
+	//NewClient is a func to create Client
+	func NewClient(target string, timeout time.Duration, idleConnPool, maxConnPool int) (pb.HelloServiceClient, error) {
+		factory := newFactory(target, timeout)
+	
+		pool, err := grpcpool.New(factory, idleConnPool, maxConnPool, time.Second)
+		if err != nil {
+			log.Errorf("Error : %v", err)
+			return nil, err
+		}
+	
+		return &client{
+			Conn: pool,
+		}, nil
+	}
+	
+	func newFactory(target string, timeout time.Duration) grpcpool.Factory {
+		return func() (*grpc.ClientConn, error) {
+			conn, err := grpc.Dial(target, grpc.WithInsecure(), withClientUnaryInterceptor(timeout))
+			if err != nil {
+				log.Errorf("Error : %v", err)
+				return nil, err
+			}
+	
+			return conn, err
+		}
+	}
+	
+	func withClientUnaryInterceptor(timeout time.Duration) grpc.DialOption {
+		return grpc.WithUnaryInterceptor(func(
+			ctx context.Context,
+			method string,
+			req interface{},
+			reply interface{},
+			cc *grpc.ClientConn,
+			invoker grpc.UnaryInvoker,
+			opts ...grpc.CallOption,
+		) error {
+			ctx, cancel := context.WithTimeout(ctx, timeout)
+			defer cancel()
+			err := invoker(ctx, method, req, reply, cc, opts...)
+			return err
+		})
+	}
+	`
+	serviceNameOnly := strings.Replace(serviceName, "-service", "", -1)
+	contents = strings.Replace(contents, "Skeleton", strcase.ToCamel(serviceNameOnly), -1)
+	bt := []byte(contents)
+	err := ioutil.WriteFile(path.Join(serviceName, "client", "client.go"), bt, 0644)
+	if err != nil {
+		g.rollbackWhenError("fail to write client")
 	}
 	return nil
 }

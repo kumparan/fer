@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"os"
+	"path"
 	"strings"
 
 	"github.com/dave/jennifer/jen" //Code project
@@ -45,7 +46,7 @@ func (s service) Generate() error {
 	for key, value := range functions {
 		f := jen.NewFile(packageName)
 		fTest := jen.NewFile(packageName)
-		s.serviceURLProtoPath = s.url + "/pb/" + createSimpleNameFromProtoPath(s.protoPath)
+		s.serviceURLProtoPath = path.Join(s.url, "pb", createSimpleNameFromProtoPath(s.protoPath))
 
 		f.ImportAlias(s.serviceURLProtoPath, "pb")
 
@@ -80,11 +81,11 @@ func (s service) Generate() error {
 			return err
 		}
 
-		err = ioutil.WriteFile(s.name+"/service/"+key+"_impl.go", buf.Bytes(), 0644)
+		err = ioutil.WriteFile(path.Join(s.name, "service", key+"_impl.go"), buf.Bytes(), 0644)
 		if err != nil {
 			return err
 		}
-		err = ioutil.WriteFile(s.name+"/service/"+key+"_impl_test.go", bufTest.Bytes(), 0644)
+		err = ioutil.WriteFile(path.Join(s.name, "service", key+"_impl_test.go"), bufTest.Bytes(), 0644)
 		if err != nil {
 			return err
 		}

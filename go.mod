@@ -7,6 +7,7 @@ require (
 	github.com/dave/jennifer v1.3.0
 	github.com/golang/protobuf v1.3.2
 	github.com/hashicorp/go-version v1.2.0
+	github.com/iancoleman/strcase v0.0.0-20190422225806-e506e3ef7365
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/mattn/go-colorable v0.1.4 // indirect
 	github.com/mattn/go-isatty v0.0.10 // indirect
