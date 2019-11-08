@@ -212,7 +212,7 @@ func (g project) rollbackWhenError(message string) {
 }
 
 func (g project) changeServiceNameOnMakefile(serviceName string) error {
-	makefilePath := filepath.Join(serviceName + "/Makefile")
+	makefilePath := filepath.Join(serviceName, "Makefile")
 	data, err := ioutil.ReadFile(makefilePath)
 	if err != nil {
 		return err
