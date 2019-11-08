@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-
 	"path/filepath"
 
 	"github.com/kumparan/fer/util"
@@ -14,6 +13,8 @@ import (
 	"os/exec"
 	"strings"
 	"time"
+
+	"github.com/iancoleman/strcase"
 )
 
 const (
@@ -51,7 +52,7 @@ func (g project) Run(serviceName string, protoPath string) {
 	if err != nil {
 		log.Fatal("folder " + serviceName + " already exist")
 	}
-	err = os.Mkdir(serviceName+"/client", os.ModePerm)
+	err = os.Mkdir(filepath.Join(serviceName, "client"), os.ModePerm)
 	if err != nil {
 		g.rollbackWhenError("fail create client folder inside " + serviceName)
 	}
@@ -69,13 +70,9 @@ func (g project) Run(serviceName string, protoPath string) {
 		protoPath = strings.ReplaceAll(protoPath, "proto", "pb.go")
 		fmt.Println("RPC Path : ", protoPath)
 		g.protoFile = protoPath
-		err = os.Mkdir(serviceName+"/"+g.getProtoFolder(protoPath), os.ModePerm)
+		err = util.CopyFolder(g.getProtoFolder(protoPath)+"/", filepath.Join(serviceName, g.getProtoFolder(protoPath)))
 		if err != nil {
-			g.rollbackWhenError("fail to create dir " + serviceName + "/" + g.getProtoFolder(protoPath))
-		}
-		err = util.CopyFolder(g.getProtoFolder(protoPath)+"/", serviceName+"/"+protoPath+"/")
-		if err != nil {
-			g.rollbackWhenError("fail to create dir " + g.getProtoFolder(protoPath) + "/" + serviceName + "/" + protoPath + "/")
+			g.rollbackWhenError("fail to create dir " + filepath.Join(serviceName, g.getProtoFolder(protoPath)))
 		}
 		g.client = NewRPCClientGenerator(g.protoFile, serviceName, serviceURL)
 		g.service = NewServiceGenerator(serviceName, serviceURL, g.protoFile)
@@ -97,6 +94,18 @@ func (g project) Run(serviceName string, protoPath string) {
 	err = g.changeServiceNameOnMakefile(serviceName)
 	if err != nil {
 		g.rollbackWhenError("fail generate makefile " + err.Error())
+	}
+	err = g.removeWorker(serviceName)
+	if err != nil {
+		g.rollbackWhenError("fail to remove worker " + err.Error())
+	}
+	err = g.removeHello(serviceName)
+	if err != nil {
+		g.rollbackWhenError("fail to remove example files " + err.Error())
+	}
+	err = g.generateClient(serviceName)
+	if err != nil {
+		g.rollbackWhenError("fail to remove worker " + err.Error())
 	}
 	fmt.Println(serviceName, "Created")
 }
@@ -227,6 +236,136 @@ func (g project) changeServiceNameOnMakefile(serviceName string) error {
 	_, err = file.WriteString(newMakefile)
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func (g project) removeHello(serviceName string) (err error) {
+	err = os.Remove(filepath.Join(serviceName, "service", "hello_service_impl.go"))
+	err = os.Remove(filepath.Join(serviceName, "service", "hello_service_impl_test.go"))
+	err = os.Remove(filepath.Join(serviceName, "repository", "hello_repository_test.go"))
+	err = os.Remove(filepath.Join(serviceName, "repository", "hello_repository.go"))
+	err = os.Remove(filepath.Join(serviceName, "repository", "model", "greeting.go"))
+	err = os.Remove(filepath.Join(serviceName, "pb", "hello.pb.go"))
+	err = os.RemoveAll(filepath.Join(serviceName, "pb", "skeleton"))
+	return
+}
+
+func (g project) removeWorker(serviceName string) error {
+	os.RemoveAll(filepath.Join(serviceName, "worker"))
+	os.RemoveAll(filepath.Join(serviceName, "event"))
+	os.Remove(filepath.Join(serviceName, "service", "service.go"))
+	os.Remove(filepath.Join(serviceName, "console", "worker.go"))
+	contents := `package service
+
+import (
+	"github.com/kumparan/go-lib/redcachekeeper"
+	"github.com/kumparan/kumnats"
+)
+
+// Service :nodoc:
+type Service struct {
+	nats        kumnats.NATS
+	cacheKeeper redcachekeeper.Keeper
+}
+
+// RegisterNATS :nodoc:
+func (s *Service) RegisterNATS(n kumnats.NATS) {
+	s.nats = n
+}
+
+// GetNATS :nodoc:
+func (s *Service) GetNATS() kumnats.NATS {
+	return s.nats
+}
+
+// NewSkeletonService :nodoc:
+func NewSkeletonService() *Service {
+	return new(Service)
+}
+
+
+// RegisterCacheKeeper :nodoc:
+func (s *Service) RegisterCacheKeeper(k redcachekeeper.Keeper) {
+	s.cacheKeeper = k
+}
+	`
+	contents = strings.Replace(contents, "Skeleton", serviceName, -1)
+	bt := []byte(contents)
+	err := ioutil.WriteFile(filepath.Join(serviceName, "service", "service.go"), bt, 0644)
+	if err != nil {
+		g.rollbackWhenError("fail to write service")
+	}
+	return nil
+}
+
+func (g project) generateClient(serviceName string) error {
+	os.Remove(filepath.Join(serviceName, "client", "client.go"))
+	contents := `package client
+	
+	import (
+		"context"
+		"time"
+	
+		grpcpool "github.com/processout/grpc-go-pool"
+		log "github.com/sirupsen/logrus"
+		"google.golang.org/grpc"
+	)
+	
+	type client struct {
+		Conn *grpcpool.Pool
+	}
+	
+	//NewClient is a func to create Client
+	func NewClient(target string, timeout time.Duration, idleConnPool, maxConnPool int) (pb.HelloServiceClient, error) {
+		factory := newFactory(target, timeout)
+	
+		pool, err := grpcpool.New(factory, idleConnPool, maxConnPool, time.Second)
+		if err != nil {
+			log.Errorf("Error : %v", err)
+			return nil, err
+		}
+	
+		return &client{
+			Conn: pool,
+		}, nil
+	}
+	
+	func newFactory(target string, timeout time.Duration) grpcpool.Factory {
+		return func() (*grpc.ClientConn, error) {
+			conn, err := grpc.Dial(target, grpc.WithInsecure(), withClientUnaryInterceptor(timeout))
+			if err != nil {
+				log.Errorf("Error : %v", err)
+				return nil, err
+			}
+	
+			return conn, err
+		}
+	}
+	
+	func withClientUnaryInterceptor(timeout time.Duration) grpc.DialOption {
+		return grpc.WithUnaryInterceptor(func(
+			ctx context.Context,
+			method string,
+			req interface{},
+			reply interface{},
+			cc *grpc.ClientConn,
+			invoker grpc.UnaryInvoker,
+			opts ...grpc.CallOption,
+		) error {
+			ctx, cancel := context.WithTimeout(ctx, timeout)
+			defer cancel()
+			err := invoker(ctx, method, req, reply, cc, opts...)
+			return err
+		})
+	}
+	`
+	serviceNameOnly := strings.Replace(serviceName, "-service", "", -1)
+	contents = strings.Replace(contents, "Skeleton", strcase.ToCamel(serviceNameOnly), -1)
+	bt := []byte(contents)
+	err := ioutil.WriteFile(filepath.Join(serviceName, "client", "client.go"), bt, 0644)
+	if err != nil {
+		g.rollbackWhenError("fail to write client")
 	}
 	return nil
 }

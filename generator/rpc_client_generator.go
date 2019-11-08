@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 
 	jen "github.com/dave/jennifer/jen" //Code generator
@@ -89,7 +90,7 @@ func (c client) Generate() error {
 	splitPath := strings.Split(c.protoPath, "/")
 	savePath := splitPath[2]
 	savePath = strings.Replace(savePath, ".pb.go", ".go", -1)
-	err = ioutil.WriteFile(c.serviceName+"/"+"client"+"/"+savePath, buf.Bytes(), 0644)
+	err = ioutil.WriteFile(filepath.Join(c.serviceName, "client", savePath), buf.Bytes(), 0644)
 	if err != nil {
 		return err
 	}
