@@ -245,7 +245,8 @@ func (g project) removeHello(serviceName string) (err error) {
 	err = os.Remove(filepath.Join(serviceName, "service", "hello_service_impl_test.go"))
 	err = os.Remove(filepath.Join(serviceName, "repository", "hello_repository_test.go"))
 	err = os.Remove(filepath.Join(serviceName, "repository", "hello_repository.go"))
-	err = os.Remove(filepath.Join(serviceName, "repository", "model/greeting.go"))
+	err = os.Remove(filepath.Join(serviceName, "repository", "model", "greeting.go"))
+	err = os.Remove(filepath.Join(serviceName, "pb", "hello.pb.go"))
 	err = os.RemoveAll(filepath.Join(serviceName, "pb", "skeleton"))
 	return
 }

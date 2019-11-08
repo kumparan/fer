@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 )
 
 //CopyFolder :nodoc:
@@ -25,9 +26,9 @@ func CopyFolder(source string, dest string) (err error) {
 
 	for _, obj := range objects {
 
-		sourcefilepointer := source + "/" + obj.Name()
+		sourcefilepointer := filepath.Join(source, obj.Name())
 
-		destinationfilepointer := dest + "/" + obj.Name()
+		destinationfilepointer := filepath.Join(dest, obj.Name())
 
 		if obj.IsDir() {
 			err = CopyFolder(sourcefilepointer, destinationfilepointer)
