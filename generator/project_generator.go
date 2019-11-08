@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"log"
 
+	"path/filepath"
+
 	"github.com/kumparan/fer/util"
 
 	"os"
@@ -92,6 +94,10 @@ func (g project) Run(serviceName string, protoPath string) {
 	}
 	g.CreateScaffoldScript()
 	g.RunScaffold(serviceName)
+	err = g.changeServiceNameOnMakefile(serviceName)
+	if err != nil {
+		g.rollbackWhenError("fail generate makefile " + err.Error())
+	}
 	fmt.Println(serviceName, "Created")
 }
 
@@ -203,4 +209,24 @@ func (g project) rollbackWhenError(message string) {
 	_ = os.Remove(template)
 	_ = os.Remove(proto2go)
 	log.Fatal(message)
+}
+
+func (g project) changeServiceNameOnMakefile(serviceName string) error {
+	makefilePath := filepath.Join(serviceName, "Makefile")
+	data, err := ioutil.ReadFile(makefilePath)
+	if err != nil {
+		return err
+	}
+	file, err := os.OpenFile(makefilePath, os.O_RDWR, 0644)
+	if err != nil {
+		return err
+	}
+	defer file.Close()
+
+	newMakefile := strings.Replace(string(data), "skeleton", serviceName, -1)
+	_, err = file.WriteString(newMakefile)
+	if err != nil {
+		return err
+	}
+	return nil
 }
