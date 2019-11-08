@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"path"
+	"path/filepath"
 
 	"github.com/kumparan/fer/util"
 
@@ -52,7 +52,7 @@ func (g project) Run(serviceName string, protoPath string) {
 	if err != nil {
 		log.Fatal("folder " + serviceName + " already exist")
 	}
-	err = os.Mkdir(path.Join(serviceName, "client"), os.ModePerm)
+	err = os.Mkdir(filepath.Join(serviceName, "client"), os.ModePerm)
 	if err != nil {
 		g.rollbackWhenError("fail create client folder inside " + serviceName)
 	}
@@ -70,9 +70,9 @@ func (g project) Run(serviceName string, protoPath string) {
 		protoPath = strings.ReplaceAll(protoPath, "proto", "pb.go")
 		fmt.Println("RPC Path : ", protoPath)
 		g.protoFile = protoPath
-		err = util.CopyFolder(g.getProtoFolder(protoPath)+"/", path.Join(serviceName, g.getProtoFolder(protoPath)))
+		err = util.CopyFolder(g.getProtoFolder(protoPath)+"/", filepath.Join(serviceName, g.getProtoFolder(protoPath)))
 		if err != nil {
-			g.rollbackWhenError("fail to create dir " + path.Join(serviceName, g.getProtoFolder(protoPath)))
+			g.rollbackWhenError("fail to create dir " + filepath.Join(serviceName, g.getProtoFolder(protoPath)))
 		}
 		g.client = NewRPCClientGenerator(g.protoFile, serviceName, serviceURL)
 		g.service = NewServiceGenerator(serviceName, serviceURL, g.protoFile)
@@ -241,20 +241,20 @@ func (g project) changeServiceNameOnMakefile(serviceName string) error {
 }
 
 func (g project) removeHello(serviceName string) (err error) {
-	err = os.Remove(path.Join(serviceName, "service", "hello_service_impl.go"))
-	err = os.Remove(path.Join(serviceName, "service", "hello_service_impl_test.go"))
-	err = os.Remove(path.Join(serviceName, "repository", "hello_repository_test.go"))
-	err = os.Remove(path.Join(serviceName, "repository", "hello_repository.go"))
-	err = os.Remove(path.Join(serviceName, "repository", "model/greeting.go"))
-	err = os.RemoveAll(path.Join(serviceName, "pb", "skeleton"))
+	err = os.Remove(filepath.Join(serviceName, "service", "hello_service_impl.go"))
+	err = os.Remove(filepath.Join(serviceName, "service", "hello_service_impl_test.go"))
+	err = os.Remove(filepath.Join(serviceName, "repository", "hello_repository_test.go"))
+	err = os.Remove(filepath.Join(serviceName, "repository", "hello_repository.go"))
+	err = os.Remove(filepath.Join(serviceName, "repository", "model/greeting.go"))
+	err = os.RemoveAll(filepath.Join(serviceName, "pb", "skeleton"))
 	return
 }
 
 func (g project) removeWorker(serviceName string) error {
-	os.RemoveAll(path.Join(serviceName, "worker"))
-	os.RemoveAll(path.Join(serviceName, "event"))
-	os.Remove(path.Join(serviceName, "service", "service.go"))
-	os.Remove(path.Join(serviceName, "console", "worker.go"))
+	os.RemoveAll(filepath.Join(serviceName, "worker"))
+	os.RemoveAll(filepath.Join(serviceName, "event"))
+	os.Remove(filepath.Join(serviceName, "service", "service.go"))
+	os.Remove(filepath.Join(serviceName, "console", "worker.go"))
 	contents := `package service
 
 import (
@@ -291,7 +291,7 @@ func (s *Service) RegisterCacheKeeper(k redcachekeeper.Keeper) {
 	`
 	contents = strings.Replace(contents, "Skeleton", serviceName, -1)
 	bt := []byte(contents)
-	err := ioutil.WriteFile(path.Join(serviceName, "service", "service.go"), bt, 0644)
+	err := ioutil.WriteFile(filepath.Join(serviceName, "service", "service.go"), bt, 0644)
 	if err != nil {
 		g.rollbackWhenError("fail to write service")
 	}
@@ -299,7 +299,7 @@ func (s *Service) RegisterCacheKeeper(k redcachekeeper.Keeper) {
 }
 
 func (g project) generateClient(serviceName string) error {
-	os.Remove(path.Join(serviceName, "client", "client.go"))
+	os.Remove(filepath.Join(serviceName, "client", "client.go"))
 	contents := `package client
 	
 	import (
@@ -362,7 +362,7 @@ func (g project) generateClient(serviceName string) error {
 	serviceNameOnly := strings.Replace(serviceName, "-service", "", -1)
 	contents = strings.Replace(contents, "Skeleton", strcase.ToCamel(serviceNameOnly), -1)
 	bt := []byte(contents)
-	err := ioutil.WriteFile(path.Join(serviceName, "client", "client.go"), bt, 0644)
+	err := ioutil.WriteFile(filepath.Join(serviceName, "client", "client.go"), bt, 0644)
 	if err != nil {
 		g.rollbackWhenError("fail to write client")
 	}
