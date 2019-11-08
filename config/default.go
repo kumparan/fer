@@ -1,6 +1,7 @@
 package config
 
 import (
+	"path/filepath"
 	"time"
 )
 
@@ -30,8 +31,12 @@ const (
 	CacheDirPerm = 0755
 	// CacheTTLFerVersion :nodoc:
 	CacheTTLFerVersion = 2 * time.Hour
-	// ConfigDir :nodoc:
-	ConfigDir = ".config/fer"
+
 	// TempDirPrefix :nodoc:
 	TempDirPrefix = "fer-"
+)
+
+var (
+	// ConfigDir :nodoc:
+	ConfigDir = filepath.Join(".config", "fer")
 )
