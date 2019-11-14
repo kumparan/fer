@@ -1,5 +1,15 @@
 #Fer 
 
+<a name="v1.3.0"></a>
+## [v1.3.0] - 2019-11-14
+### Fixes
+- takeout worker from service and fix folder copying ([#11](https://github.com/kumparan/fer/issues/11))
+- change makefile with service name ([#10](https://github.com/kumparan/fer/issues/10))
+
+### New Features
+- fer check latest version ([#8](https://github.com/kumparan/fer/issues/8))
+
+
 <a name="v1.2.1"></a>
 ## [v1.2.1] - 2019-10-25
 ### Fixes
@@ -32,7 +42,8 @@
 - db migrationfile generator ([#3](https://github.com/kumparan/fer/issues/3))
 
 
-[Unreleased]: https://github.com/kumparan/fer/compare/v1.2.1...HEAD
+[Unreleased]: https://github.com/kumparan/fer/compare/v1.3.0...HEAD
+[v1.3.0]: https://github.com/kumparan/fer/compare/v1.2.1...v1.3.0
 [v1.2.1]: https://github.com/kumparan/fer/compare/v1.2.0...v1.2.1
 [v1.2.0]: https://github.com/kumparan/fer/compare/v1.1.0...v1.2.0
 [v1.1.0]: https://github.com/kumparan/fer/compare/v1.0.1...v1.1.0
