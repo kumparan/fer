@@ -15,7 +15,7 @@ import (
 var (
 	errorDownload   = "fail downloaded protobuf"
 	errorUnzip      = "fail unzip protobuf"
-	errorInstall    = "fail installeded protobuf"
+	errorInstall    = "fail installing protobuf"
 	successDownload = "success downloaded protobuf"
 )
 
@@ -54,7 +54,6 @@ func ProtobufInstaller() {
 		_, err := Unzip(filePath, "/usr/local/bin/")
 		if err != nil {
 			ProgressBar(1)
-			log.Fatal(err)
 			fmt.Println(errorUnzip)
 			os.Exit(1)
 		}
@@ -62,7 +61,6 @@ func ProtobufInstaller() {
 		_, err = Unzip(filePath, "include/*")
 		if err != nil {
 			ProgressBar(1)
-			log.Fatal(err)
 			fmt.Println(errorUnzip)
 			os.Exit(1)
 		}
@@ -71,7 +69,6 @@ func ProtobufInstaller() {
 		err = cmdRemoveProtocZip.Run()
 		if err != nil {
 			ProgressBar(1)
-			log.Fatal(err)
 			fmt.Println(errorUnzip)
 			os.Exit(1)
 		}
