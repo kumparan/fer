@@ -1,5 +1,11 @@
 #Fer 
 
+<a name="v1.4.0"></a>
+## [v1.4.0] - 2020-01-06
+### New Features
+- add dev-f deployment ([#12](https://github.com/kumparan/fer/issues/12))
+
+
 <a name="v1.3.0"></a>
 ## [v1.3.0] - 2019-11-14
 ### Fixes
@@ -42,7 +48,8 @@
 - db migrationfile generator ([#3](https://github.com/kumparan/fer/issues/3))
 
 
-[Unreleased]: https://github.com/kumparan/fer/compare/v1.3.0...HEAD
+[Unreleased]: https://github.com/kumparan/fer/compare/v1.4.0...HEAD
+[v1.4.0]: https://github.com/kumparan/fer/compare/v1.3.0...v1.4.0
 [v1.3.0]: https://github.com/kumparan/fer/compare/v1.2.1...v1.3.0
 [v1.2.1]: https://github.com/kumparan/fer/compare/v1.2.0...v1.2.1
 [v1.2.0]: https://github.com/kumparan/fer/compare/v1.1.0...v1.2.0
