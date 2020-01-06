@@ -95,5 +95,7 @@ repository/promoted_link_repository.go created
 `fer deploy dev-a`
 for deployment, push deployment tag
 
-
+## Create Changelog
+`fer create chglog vx.x.x`
+for generate CHANGELOG.md
 
