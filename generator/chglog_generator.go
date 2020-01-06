@@ -82,7 +82,7 @@ func InitChangelog(style, repositoryURL string) {
 //CreateChangelog :nodoc:
 func CreateChangelog(version string) {
 	fmt.Println("Creating CHANGELOG.md file")
-	getWorkingDirectory, err := exec.Command("pwd").Output()
+	getWorkingDirectory, err := os.Getwd()
 	if err != nil {
 		installer.ProgressBar(1)
 		fmt.Println("failed to generate changelog")
@@ -90,16 +90,7 @@ func CreateChangelog(version string) {
 		os.Exit(1)
 	}
 
-	workingDirectory := string(getWorkingDirectory)
-	cmd := exec.Command("cd", workingDirectory)
-	err = cmd.Run()
-	if err != nil {
-		installer.ProgressBar(1)
-		fmt.Println("failed to generate changelog")
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
+	os.Chdir(getWorkingDirectory)
 	createChgLogFile := exec.Command("git-chglog", "--next-tag", version, "-o", "CHANGELOG.md", "-p", "^v")
 	err = createChgLogFile.Run()
 	if err != nil {
