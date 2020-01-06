@@ -81,7 +81,6 @@ func InitChangelog(style, repositoryURL string) {
 
 //CreateChangelog :nodoc:
 func CreateChangelog(version string) {
-	fmt.Println(version)
 	fmt.Println("Creating CHANGELOG.md file")
 	getWorkingDirectory, err := os.Getwd()
 	if err != nil {
