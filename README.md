@@ -97,5 +97,5 @@ for deployment, push deployment tag
 
 ## Create Changelog
 `fer create chglog vx.x.x`
-for generate CHANGELOG.md
+to generate CHANGELOG.md
 
