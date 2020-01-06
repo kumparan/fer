@@ -150,7 +150,7 @@ func ProgressBar(stopProgress int) {
 
 	for i := 0; i < count; i++ {
 		bar.Increment()
-		time.Sleep(time.Millisecond * 100)
+		time.Sleep(time.Millisecond * 30)
 	}
 	bar.Finish()
 }
