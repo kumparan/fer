@@ -85,7 +85,7 @@ func CreateChangelog(version string) {
 	getWorkingDirectory, err := os.Getwd()
 	if err != nil {
 		installer.ProgressBar(1)
-		fmt.Println("failed to generate changelog", getWorkingDirectory)
+		fmt.Println("failed to generate changelog")
 		fmt.Println(err)
 		os.Exit(1)
 	}
@@ -95,7 +95,7 @@ func CreateChangelog(version string) {
 	err = createChgLogFile.Run()
 	if err != nil {
 		installer.ProgressBar(1)
-		fmt.Println("failed to generate changelog2")
+		fmt.Println("failed to generate changelog")
 		fmt.Println(err)
 		os.Exit(1)
 	}
