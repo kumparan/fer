@@ -15,7 +15,7 @@ import (
 
 const (
 	//AvailableTargets define to info the command
-	AvailableTargets = "available targets: dev,dev-a,dev-b,dev-c,dev-d,dev-e,staging,prod"
+	AvailableTargets = "available targets: dev,dev-a,dev-b,dev-c,dev-d,dev-e,dev-f,staging,prod"
 )
 
 var targetMap = map[string]string{
@@ -25,6 +25,7 @@ var targetMap = map[string]string{
 	"dev-c":   "dev-c",
 	"dev-d":   "dev-d",
 	"dev-e":   "dev-e",
+	"dev-f":   "dev-f",
 	"staging": "preview",
 	"prod":    "stable",
 }
