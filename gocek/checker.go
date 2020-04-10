@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/kumparan/go-utils"
+	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -19,15 +20,27 @@ const (
 
 // ModuleChecker :nodoc:
 type ModuleChecker struct {
+	rootDir string
 }
 
-// Checks check module projects and save the json file
-func (mc *ModuleChecker) Checks(dirs []string) {
-	rootDir, err := os.Getwd()
+// CheckCWD call CheckCWD() and print into stdout
+func (mc *ModuleChecker) CheckCWD() {
+	modlist, err := CheckCWD()
 	if err != nil {
 		log.Fatal(err)
 	}
 
+	table := tablewriter.NewWriter(os.Stdout)
+	table.SetHeader([]string{"Path", "Version", "NextVersion"})
+
+	for _, v := range modlist {
+		table.Append([]string{v.Path, v.Version, v.NextVersion})
+	}
+	table.Render() // Send output
+}
+
+// Checks check module projects and save the json file
+func (mc *ModuleChecker) Checks(dirs []string) {
 	for _, dir := range dirs {
 		os.Chdir(dir)
 		modules, err := CheckCWD()
@@ -35,7 +48,7 @@ func (mc *ModuleChecker) Checks(dirs []string) {
 			continue
 		}
 
-		err = mc.save(rootDir, modules)
+		err = mc.save(modules)
 		if err != nil {
 			log.Error(err)
 			return
@@ -44,11 +57,11 @@ func (mc *ModuleChecker) Checks(dirs []string) {
 }
 
 // save modules as json
-func (mc *ModuleChecker) save(rootDir string, modules []*SimpleModule) error {
+func (mc *ModuleChecker) save(modules []*SimpleModule) error {
 	now := time.Now()
 	layout := "2006-01-02"
 
-	dst := fmt.Sprintf("%s/bin/%s.mod.json", rootDir, now.Format(layout))
+	dst := fmt.Sprintf("%s/bin/%s.mod.json", mc.rootDir, now.Format(layout))
 	f, err := os.Create(dst)
 	if err != nil {
 		log.Error(err)
