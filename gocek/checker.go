@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"strings"
 	"sync"
 	"time"
@@ -20,7 +21,7 @@ const (
 
 // ModuleChecker :nodoc:
 type ModuleChecker struct {
-	rootDir string
+	RootDir string
 }
 
 // CheckCWD call CheckCWD() and print into stdout
@@ -31,7 +32,7 @@ func (mc *ModuleChecker) CheckCWD() {
 	}
 
 	table := tablewriter.NewWriter(os.Stdout)
-	table.SetHeader([]string{"Path", "Version", "NextVersion"})
+	table.SetHeader([]string{"Path", "Version", "Next Version"})
 
 	for _, v := range modlist {
 		table.Append([]string{v.Path, v.Version, v.NextVersion})
@@ -48,20 +49,23 @@ func (mc *ModuleChecker) Checks(dirs []string) {
 			continue
 		}
 
-		err = mc.save(modules)
+		sdir := strings.Split(dir, "/")
+		err = mc.save(sdir[len(sdir)-1], modules)
 		if err != nil {
 			log.Error(err)
 			return
 		}
+		os.Chdir(mc.RootDir)
 	}
 }
 
 // save modules as json
-func (mc *ModuleChecker) save(modules []*SimpleModule) error {
+func (mc *ModuleChecker) save(modName string, modules []*SimpleModule) error {
 	now := time.Now()
 	layout := "2006-01-02"
+	fileName := fmt.Sprintf("%s.%s.json", modName, now.Format(layout))
+	dst := path.Join(mc.RootDir, fileName)
 
-	dst := fmt.Sprintf("%s/bin/%s.mod.json", mc.rootDir, now.Format(layout))
 	f, err := os.Create(dst)
 	if err != nil {
 		log.Error(err)
@@ -69,7 +73,7 @@ func (mc *ModuleChecker) save(modules []*SimpleModule) error {
 	}
 	defer f.Close()
 
-	log.Info("saving file...")
+	log.Infof("saving %s", fileName)
 
 	_, err = f.Write([]byte(utils.Dump(modules)))
 	return err
@@ -90,6 +94,8 @@ func findAllModuleUpdate(mods []string) (modules []*SimpleModule, err error) {
 	queue := make(map[int][]string)
 	count := 0
 
+	// group the module per QueueSize,
+	// so each group can be conccurently execute
 	for _, m := range mods {
 		queue[count] = append(queue[count], m)
 		if len(queue[count]) == _defaultMaxQueueSize {
@@ -98,11 +104,11 @@ func findAllModuleUpdate(mods []string) (modules []*SimpleModule, err error) {
 	}
 
 	modsCh := make(chan *Module, len(mods))
-	for _, mods := range queue {
+	for _, q := range queue {
 		wg := sync.WaitGroup{}
 
-		for _, m := range mods {
-			wg.Add(1)
+		wg.Add(len(q))
+		for _, m := range q {
 			go func(m string) {
 				defer wg.Done()
 
