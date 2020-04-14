@@ -1,8 +1,9 @@
 package console
 
 import (
-	"github.com/spf13/cobra"
 	"os"
+
+	"github.com/spf13/cobra"
 )
 
 // RootCmd represents the base command when called without any subcommands
@@ -35,4 +36,5 @@ func init() {
 	rootCmd.AddCommand(installCmd)
 	rootCmd.AddCommand(initCmd)
 	rootCmd.AddCommand(createCmd)
+	rootCmd.AddCommand(updateCmd)
 }

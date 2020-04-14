@@ -1,11 +1,12 @@
 package console
 
 import (
-	"github.com/gookit/color"
-	"github.com/kumparan/fer/config"
 	"log"
 	"os/user"
 	"path/filepath"
+
+	"github.com/gookit/color"
+	"github.com/kumparan/fer/config"
 )
 
 // PrintError :nodoc:
@@ -21,6 +22,11 @@ func PrintInfo(format string, args ...interface{}) {
 // PrintWarn :nodoc:
 func PrintWarn(format string, args ...interface{}) {
 	color.Warn.Printf(format, args...)
+}
+
+// PrintSuccess :nodoc:
+func PrintSuccess(format string, args ...interface{}) {
+	color.Success.Printf(format, args...)
 }
 
 // GetConfigDir :nodoc:
