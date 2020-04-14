@@ -17,8 +17,10 @@ var updateCmd = &cobra.Command{
 }
 
 func updateVersion(cmd *cobra.Command, args []string) {
-	updateCommand := exec.Command("bash", "GO111MODULE=on", "go", "get", "github.com/kumparan/fer@latest")
-	PrintInfo("Updating fer...")
+	updateCommand := exec.Command("go", "get", "github.com/kumparan/fer@latest")
+	updateCommand.Env = append(os.Environ(),
+		"GO111MODULE=on",
+	)
 	err := updateCommand.Run()
 	if err != nil {
 		installer.ProgressBar(1)
