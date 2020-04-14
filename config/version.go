@@ -1,4 +1,4 @@
 package config
 
 // Version define version of fer
-const Version = "v1.5.0"
+const Version = "v1.5.1"

@@ -1,5 +1,11 @@
 #Fer 
 
+<a name="v1.5.1"></a>
+## [v1.5.1] - 2020-04-14
+### Fixes
+- fix fer update command
+
+
 <a name="v1.5.0"></a>
 ## [v1.5.0] - 2020-04-14
 ### New Features
@@ -60,7 +66,8 @@
 - db migrationfile generator ([#3](https://github.com/kumparan/fer/issues/3))
 
 
-[Unreleased]: https://github.com/kumparan/fer/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/kumparan/fer/compare/v1.5.1...HEAD
+[v1.5.1]: https://github.com/kumparan/fer/compare/v1.5.0...v1.5.1
 [v1.5.0]: https://github.com/kumparan/fer/compare/v1.4.1...v1.5.0
 [v1.4.1]: https://github.com/kumparan/fer/compare/v1.4.0...v1.4.1
 [v1.4.0]: https://github.com/kumparan/fer/compare/v1.3.0...v1.4.0
