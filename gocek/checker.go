@@ -10,7 +10,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/kumparan/go-utils"
 	"github.com/olekukonko/tablewriter"
 	log "github.com/sirupsen/logrus"
 )
@@ -75,7 +74,12 @@ func (mc *ModuleChecker) save(modName string, modules []*SimpleModule) error {
 
 	log.Infof("saving %s", fileName)
 
-	_, err = f.Write([]byte(utils.Dump(modules)))
+	j, err := json.MarshalIndent(modules, " ", "	")
+	if err != nil {
+		return err
+	}
+
+	_, err = f.Write([]byte(j))
 	return err
 }
 

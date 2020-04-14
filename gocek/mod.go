@@ -21,5 +21,5 @@ type Module struct {
 type SimpleModule struct {
 	Path        string `json:"path"`
 	Version     string `json:"version"`
-	NextVersion string `json:"nextVersion"`
+	NextVersion string `json:"next_version"`
 }
