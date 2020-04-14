@@ -1,9 +1,16 @@
 #Fer 
 
+<a name="v1.5.4"></a>
+## [v1.5.4] - 2020-04-14
+### Fixes
+- fixed self updater
+- fix self updater
+
+
 <a name="v1.5.3"></a>
 ## [v1.5.3] - 2020-04-14
 ### Fixes
-- fix self updater
+- self update not working ([#15](https://github.com/kumparan/fer/issues/15))
 
 
 <a name="v1.5.2"></a>
@@ -78,7 +85,8 @@
 - db migrationfile generator ([#3](https://github.com/kumparan/fer/issues/3))
 
 
-[Unreleased]: https://github.com/kumparan/fer/compare/v1.5.3...HEAD
+[Unreleased]: https://github.com/kumparan/fer/compare/v1.5.4...HEAD
+[v1.5.4]: https://github.com/kumparan/fer/compare/v1.5.3...v1.5.4
 [v1.5.3]: https://github.com/kumparan/fer/compare/v1.5.2...v1.5.3
 [v1.5.2]: https://github.com/kumparan/fer/compare/v1.5.1...v1.5.2
 [v1.5.1]: https://github.com/kumparan/fer/compare/v1.5.0...v1.5.1
