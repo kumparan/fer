@@ -17,7 +17,10 @@ var updateCmd = &cobra.Command{
 }
 
 func updateVersion(cmd *cobra.Command, args []string) {
-	updateCommand := exec.Command("bash", "GO111MODULE=on", "go", "get", "github.com/kumparan/fer@latest")
+	updateCommand := exec.Command("go", "get", "github.com/kumparan/fer@latest")
+	updateCommand.Env = append(os.Environ(),
+		"GO111MODULE=on",
+	)
 	PrintInfo("Updating fer...")
 	err := updateCommand.Run()
 	if err != nil {
