@@ -1,9 +1,23 @@
 #Fer 
 
+<a name="v1.6.0"></a>
+## [v1.6.0] - 2020-04-16
+### New Features
+- add fer & gocek config
+- add gocek all to check all modules provided
+- add gocek to console
+- add checker
+- add mod model
+
+### Other Improvements
+- remove debug log
+- add .ferconfig.json example
+
+
 <a name="v1.5.4"></a>
 ## [v1.5.4] - 2020-04-14
 ### Fixes
-- fix self update
+- self update ([#17](https://github.com/kumparan/fer/issues/17))
 
 
 <a name="v1.5.3"></a>
@@ -84,7 +98,8 @@
 - db migrationfile generator ([#3](https://github.com/kumparan/fer/issues/3))
 
 
-[Unreleased]: https://github.com/kumparan/fer/compare/v1.5.4...HEAD
+[Unreleased]: https://github.com/kumparan/fer/compare/v1.6.0...HEAD
+[v1.6.0]: https://github.com/kumparan/fer/compare/v1.5.4...v1.6.0
 [v1.5.4]: https://github.com/kumparan/fer/compare/v1.5.3...v1.5.4
 [v1.5.3]: https://github.com/kumparan/fer/compare/v1.5.2...v1.5.3
 [v1.5.2]: https://github.com/kumparan/fer/compare/v1.5.1...v1.5.2
