@@ -10,6 +10,7 @@
 - add mod model
 
 ### Other Improvements
+- add .ferconfig.json.example & update README
 - remove debug log
 - add .ferconfig.json example
 
