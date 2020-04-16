@@ -39,7 +39,6 @@ func init() {
 */
 func loadCfg() {
 	cfgPath := FerConfigPath()
-	log.Info(cfgPath)
 	_, err := os.Stat(cfgPath)
 	switch {
 	case os.IsNotExist(err):
