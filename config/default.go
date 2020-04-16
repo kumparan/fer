@@ -18,7 +18,8 @@ const (
 	RichgoInstallerURL = "github.com/kyoh86/richgo"
 	// GolintInstallerURL :nodoc:
 	GolintInstallerURL = "github.com/golangci/golangci-lint/cmd/golangci-lint"
-	ProtobufVersion    = "3.7.1"
+	// ProtobufVersion :nodoc:
+	ProtobufVersion = "3.7.1"
 	// ProtobufOSXInstallerURL :nodoc:
 	ProtobufOSXInstallerURL = "https://github.com/protocolbuffers/protobuf/releases/download/v3.7.1/protoc-3.7.1-osx-x86_64.zip"
 	// ProtobufLinuxInstallerURL :nodoc:
