@@ -18,8 +18,12 @@ fer version
 -   [x] Generate Service&test files and Client files From Proto
 -   [x] DB migration file generator
 -   [x] Generate Repository (include model)
+-   [x] Gocek, checks go mod update info
 -   [ ] Add worker with command
 -   [ ] Add Nats Subscriber with command
+
+## Config
+Add `.ferconfig.json` into `$HOME/.ferconfig.json`, use the `.ferconfig.json.example` as reference
 
 ## Kumparan Microservices Generator 
 `fer generate project content-service --proto pb/example/example.proto`
@@ -99,3 +103,9 @@ for deployment, push deployment tag
 `fer create chglog vx.x.x`
 to generate CHANGELOG.md
 
+## Gocek
+`fer gocek`
+check current working directory 
+
+`fer gocek all`
+check all directory listed in `.ferconfig.json`

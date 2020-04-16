@@ -29,14 +29,6 @@ func init() {
 	})
 }
 
-/*.ferconfig.json example
-{
-	"gocek": {
-		"project_directories": [],
-		"output_save_folder": ""
-	}
-}
-*/
 func loadCfg() {
 	cfgPath := FerConfigPath()
 	_, err := os.Stat(cfgPath)
