@@ -42,8 +42,8 @@ func installAll(_ *cobra.Command, _ []string) {
 	installer.InstallGoUtils("richgo", config.RichgoInstallerURL)
 	installer.InstallGoUtils("golint", config.GolintInstallerURL)
 	installer.InstallGoUtils("git-chglog", config.ChangeLogInstallerURL)
-	installer.InstallWatchmedo()
 	installer.ProtobufInstaller()
+	installer.InstallModd()
 	os.Exit(0)
 }
 
@@ -132,18 +132,6 @@ func installChglogCmd(_ *cobra.Command, _ []string) {
 	installer.CheckExistenceOfGolang()
 	installer.CheckGolangVersion()
 	installer.InstallGoUtils("git-chglog", config.MockgenInstallerURL)
-	os.Exit(0)
-}
-
-var watchmedoCmd = &cobra.Command{
-	Use:   "watchmedo",
-	Short: "This subcommand to install watchmedo",
-	Long:  "Watchdog comes with an optional utility script called watchmedo.",
-	Run:   installWatchmedoCmd,
-}
-
-func installWatchmedoCmd(cmd *cobra.Command, args []string) {
-	installer.InstallWatchmedo()
 	os.Exit(0)
 }
 
