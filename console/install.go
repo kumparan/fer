@@ -9,12 +9,12 @@ import (
 )
 
 var installCmd = &cobra.Command{
-	Use: "install",
+	Use:   "install",
 	Short: "install dependencies for your project",
-	Long: "install what do you need for backend contributed",
+	Long:  "install what do you need for backend contributed",
 }
 
-func init(){
+func init() {
 	installCmd.AddCommand(installAllCmd)
 	installCmd.AddCommand(goUtilsCmd)
 	installCmd.AddCommand(protocGenCmd)
@@ -24,10 +24,11 @@ func init(){
 	installCmd.AddCommand(chglogCmd)
 	installCmd.AddCommand(watchmedoCmd)
 	installCmd.AddCommand(protobufCmd)
+	installCmd.AddCommand(moddCmd)
 }
 
 var installAllCmd = &cobra.Command{
-	Use: "all",
+	Use:   "all",
 	Short: "This subcommand to install all dependencies",
 	Long:  "install all dependencies for contributing to backend projects",
 	Run:   installAll,
@@ -41,8 +42,8 @@ func installAll(_ *cobra.Command, _ []string) {
 	installer.InstallGoUtils("richgo", config.RichgoInstallerURL)
 	installer.InstallGoUtils("golint", config.GolintInstallerURL)
 	installer.InstallGoUtils("git-chglog", config.ChangeLogInstallerURL)
-	installer.InstallWatchmedo()
 	installer.ProtobufInstaller()
+	installer.InstallModd()
 	os.Exit(0)
 }
 
@@ -67,7 +68,7 @@ func installGoUtilsCmd(_ *cobra.Command, _ []string) {
 var protocGenCmd = &cobra.Command{
 	Use:   "protoc-gen",
 	Short: "This subcommand to install protoc generator",
-	Long:  "Go version must be " +config.GoVersion+ " or latest",
+	Long:  "Go version must be " + config.GoVersion + " or latest",
 	Run:   installProtocGenCmd,
 }
 
@@ -134,18 +135,6 @@ func installChglogCmd(_ *cobra.Command, _ []string) {
 	os.Exit(0)
 }
 
-var watchmedoCmd = &cobra.Command{
-	Use:   "watchmedo",
-	Short: "This subcommand to install watchmedo",
-	Long:  "Watchdog comes with an optional utility script called watchmedo.",
-	Run:   installWatchmedoCmd,
-}
-
-func installWatchmedoCmd(cmd *cobra.Command, args []string) {
-	installer.InstallWatchmedo()
-	os.Exit(0)
-}
-
 var protobufCmd = &cobra.Command{
 	Use:   "protobuf",
 	Short: "This subcommand to install protobuf",
@@ -155,5 +144,17 @@ var protobufCmd = &cobra.Command{
 
 func installProtobufCmd(cmd *cobra.Command, args []string) {
 	installer.ProtobufInstaller()
+	os.Exit(0)
+}
+
+var moddCmd = &cobra.Command{
+	Use:   "modd",
+	Short: "This subcommand to install modd",
+	Long:  "Modd is a developer tool that triggers commands and manages daemons in response to filesystem changes. https://github.com/cortesi/modd",
+	Run:   installModdCmd,
+}
+
+func installModdCmd(cmd *cobra.Command, args []string) {
+	installer.InstallModd()
 	os.Exit(0)
 }
