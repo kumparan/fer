@@ -22,7 +22,6 @@ func init() {
 	installCmd.AddCommand(richgoCmd)
 	installCmd.AddCommand(golintCmd)
 	installCmd.AddCommand(chglogCmd)
-	installCmd.AddCommand(watchmedoCmd)
 	installCmd.AddCommand(protobufCmd)
 	installCmd.AddCommand(moddCmd)
 }

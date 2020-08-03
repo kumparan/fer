@@ -1,9 +1,15 @@
 #Fer 
 
+<a name="v1.7.1"></a>
+## [v1.7.1] - 2020-08-03
+### Fixes
+- fix remove install watchmedo
+
+
 <a name="v1.7.0"></a>
 ## [v1.7.0] - 2020-07-28
 ### New Features
-- add modd installer
+- add modd installer ([#20](https://github.com/kumparan/fer/issues/20))
 
 
 <a name="v1.6.0"></a>
@@ -105,7 +111,8 @@
 - db migrationfile generator ([#3](https://github.com/kumparan/fer/issues/3))
 
 
-[Unreleased]: https://github.com/kumparan/fer/compare/v1.7.0...HEAD
+[Unreleased]: https://github.com/kumparan/fer/compare/v1.7.1...HEAD
+[v1.7.1]: https://github.com/kumparan/fer/compare/v1.7.0...v1.7.1
 [v1.7.0]: https://github.com/kumparan/fer/compare/v1.6.0...v1.7.0
 [v1.6.0]: https://github.com/kumparan/fer/compare/v1.5.4...v1.6.0
 [v1.5.4]: https://github.com/kumparan/fer/compare/v1.5.3...v1.5.4
