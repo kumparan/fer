@@ -27,10 +27,11 @@ var gocekAllCmd = &cobra.Command{
 func gocekAll(cmd *cobra.Command, args []string) {
 	cfg := config.GetFerConfig()
 	checker := gocek.ModuleChecker{
-		RootDir: cfg.Gocek.SaveOutputDir,
+		RootDir:      cfg.Gocek.SaveOutputDir,
+		ServicesDirs: cfg.Gocek.ProjectDirs,
 	}
 
-	checker.Checks(cfg.Gocek.ProjectDirs)
+	checker.Checks()
 }
 
 func gocekCWD(cmd *cobra.Command, args []string) {
