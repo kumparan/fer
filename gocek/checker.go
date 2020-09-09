@@ -16,16 +16,18 @@ import (
 
 const (
 	_defaultMaxQueueSize = int(10)
+	timeLayout           = "2006-01-02"
 )
 
 // ModuleChecker :nodoc:
 type ModuleChecker struct {
-	RootDir string
+	RootDir      string
+	ServicesDirs []string
 }
 
-// CheckCWD call CheckCWD() and print into stdout
+// CheckCWD call checkCWD() and print into stdout
 func (mc *ModuleChecker) CheckCWD() {
-	modlist, err := CheckCWD()
+	modlist, err := checkCWD()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -40,16 +42,24 @@ func (mc *ModuleChecker) CheckCWD() {
 }
 
 // Checks check module projects and save the json file
-func (mc *ModuleChecker) Checks(dirs []string) {
-	for _, dir := range dirs {
+func (mc *ModuleChecker) Checks() {
+	now := time.Now()
+	folder := now.Format(timeLayout)
+	savePath := path.Join(mc.RootDir, folder)
+	err := os.MkdirAll(savePath, 0755)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	for _, dir := range mc.ServicesDirs {
 		os.Chdir(dir)
-		modules, err := CheckCWD()
+		modules, err := checkCWD()
 		if err != nil {
 			continue
 		}
 
 		sdir := strings.Split(dir, "/")
-		err = mc.save(sdir[len(sdir)-1], modules)
+		err = mc.save(savePath, sdir[len(sdir)-1], modules)
 		if err != nil {
 			log.Error(err)
 			return
@@ -59,13 +69,9 @@ func (mc *ModuleChecker) Checks(dirs []string) {
 }
 
 // save modules as json
-func (mc *ModuleChecker) save(modName string, modules []*SimpleModule) error {
-	now := time.Now()
-	layout := "2006-01-02"
-	fileName := fmt.Sprintf("%s.%s.json", modName, now.Format(layout))
-	dst := path.Join(mc.RootDir, fileName)
-
-	f, err := os.Create(dst)
+func (mc *ModuleChecker) save(savePath, modName string, modules []*SimpleModule) error {
+	fileName := fmt.Sprintf("%s.json", modName)
+	f, err := os.Create(path.Join(savePath, fileName))
 	if err != nil {
 		log.Error(err)
 		return err
@@ -83,8 +89,8 @@ func (mc *ModuleChecker) save(modName string, modules []*SimpleModule) error {
 	return err
 }
 
-// CheckCWD check current working directory
-func CheckCWD() (modules []*SimpleModule, err error) {
+// checkCWD check current working directory
+func checkCWD() (modules []*SimpleModule, err error) {
 	modList, err := findDirectModList()
 	if err != nil {
 		log.Error(err)
@@ -118,7 +124,7 @@ func findAllModuleUpdate(mods []string) (modules []*SimpleModule, err error) {
 
 				mod, err := findModuleUpdate(m)
 				if err != nil {
-					log.Error(err)
+					log.Error("findModuleUpdate: ", err)
 					return
 				}
 
@@ -183,6 +189,7 @@ func findModList() ([]string, error) {
 func findDirectModList() ([]string, error) {
 	out, err := exec.Command("go", "list", "-m", "-f", `{{ .Path }} | {{ .Indirect }}`, "all").Output()
 	if err != nil {
+		log.Error("findDirectModList: ", err)
 		return nil, err
 	}
 	splitted := strings.Split(string(out), "\n")
