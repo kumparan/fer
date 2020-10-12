@@ -52,7 +52,7 @@ func (d *deployment) Run(target string) {
 	}
 	tagTime := CreateTagTime()
 	tag := target + "-" + tagTime
-	fmt.Println("Releasing verion to |", target, "|")
+	fmt.Println("Releasing version to |", target, "|")
 	fmt.Println("Version " + tag)
 	fmt.Println("Please Input Tag Description: ")
 	desc, _ := reader.ReadString('\n')

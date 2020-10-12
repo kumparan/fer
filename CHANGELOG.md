@@ -1,7 +1,13 @@
 #Fer 
 
+<a name="v1.8.1"></a>
+## [v1.8.1] - 2020-10-12
+### Other Improvements
+- fix typo in deployment message
+
+
 <a name="v1.8.0"></a>
-## [v1.8.0] - 2020-09-04
+## [v1.8.0] - 2020-09-09
 ### New Features
 - update gocek checker result path
 
@@ -9,7 +15,7 @@
 <a name="v1.7.2"></a>
 ## [v1.7.2] - 2020-08-04
 ### Fixes
-- wrong version
+- version fix ([#22](https://github.com/kumparan/fer/issues/22))
 
 
 <a name="v1.7.1"></a>
@@ -123,7 +129,8 @@
 - db migrationfile generator ([#3](https://github.com/kumparan/fer/issues/3))
 
 
-[Unreleased]: https://github.com/kumparan/fer/compare/v1.8.0...HEAD
+[Unreleased]: https://github.com/kumparan/fer/compare/v1.8.1...HEAD
+[v1.8.1]: https://github.com/kumparan/fer/compare/v1.8.0...v1.8.1
 [v1.8.0]: https://github.com/kumparan/fer/compare/v1.7.2...v1.8.0
 [v1.7.2]: https://github.com/kumparan/fer/compare/v1.7.1...v1.7.2
 [v1.7.1]: https://github.com/kumparan/fer/compare/v1.7.0...v1.7.1
