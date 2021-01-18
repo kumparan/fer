@@ -16,6 +16,8 @@ const (
 	MockgenInstallerURL = "github.com/golang/mock/mockgen"
 	// RichgoInstallerURL :nodoc:
 	RichgoInstallerURL = "github.com/kyoh86/richgo"
+	// GocognitInstallerURL :nodoc:
+	GocognitInstallerURL = "github.com/uudashr/gocognit/cmd/gocognit"
 	// GolintInstallerURL :nodoc:
 	GolintInstallerURL = "github.com/golangci/golangci-lint/cmd/golangci-lint"
 	// ProtobufVersion :nodoc:

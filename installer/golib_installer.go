@@ -5,8 +5,8 @@ import (
 	"os/exec"
 )
 
-// InstallGoUtils :nodoc:
-func InstallGoUtils(installername, URL string) {
+// InstallGoLib :nodoc:
+func InstallGoLib(installername, URL string) {
 	fmt.Println("Installing ", installername)
 	cmd := exec.Command("go", "get", "-u", URL)
 	err := cmd.Run()

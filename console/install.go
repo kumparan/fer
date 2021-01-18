@@ -16,11 +16,12 @@ var installCmd = &cobra.Command{
 
 func init() {
 	installCmd.AddCommand(installAllCmd)
-	installCmd.AddCommand(goUtilsCmd)
+	installCmd.AddCommand(goLibCmd)
 	installCmd.AddCommand(protocGenCmd)
 	installCmd.AddCommand(mockgenCmd)
 	installCmd.AddCommand(richgoCmd)
 	installCmd.AddCommand(golintCmd)
+	installCmd.AddCommand(gocognitCmd)
 	installCmd.AddCommand(chglogCmd)
 	installCmd.AddCommand(protobufCmd)
 	installCmd.AddCommand(moddCmd)
@@ -36,31 +37,33 @@ var installAllCmd = &cobra.Command{
 func installAll(_ *cobra.Command, _ []string) {
 	installer.CheckExistenceOfGolang()
 	installer.CheckGolangVersion()
-	installer.InstallGoUtils("protoc-gen-go", config.ProtobufInstallerURL)
-	installer.InstallGoUtils("mockgen", config.MockgenInstallerURL)
-	installer.InstallGoUtils("richgo", config.RichgoInstallerURL)
-	installer.InstallGoUtils("golint", config.GolintInstallerURL)
-	installer.InstallGoUtils("git-chglog", config.ChangeLogInstallerURL)
+	installer.InstallGoLib("protoc-gen-go", config.ProtobufInstallerURL)
+	installer.InstallGoLib("mockgen", config.MockgenInstallerURL)
+	installer.InstallGoLib("richgo", config.RichgoInstallerURL)
+	installer.InstallGoLib("golint", config.GolintInstallerURL)
+	installer.InstallGoLib("gocognit", config.GocognitInstallerURL)
+	installer.InstallGoLib("git-chglog", config.ChangeLogInstallerURL)
 	installer.ProtobufInstaller()
 	installer.InstallModd()
 	os.Exit(0)
 }
 
-var goUtilsCmd = &cobra.Command{
-	Use:   "goutils",
-	Short: "This subcommand to install all go utils",
-	Long:  "To install all goutils, your golang version must %s or latest",
-	Run:   installGoUtilsCmd,
+var goLibCmd = &cobra.Command{
+	Use:   "golib",
+	Short: "This subcommand to install all go lib",
+	Long:  "To install all go lib, your golang version must %s or latest",
+	Run:   installGoLibCmd,
 }
 
-func installGoUtilsCmd(_ *cobra.Command, _ []string) {
+func installGoLibCmd(_ *cobra.Command, _ []string) {
 	installer.CheckExistenceOfGolang()
 	installer.CheckGolangVersion()
-	installer.InstallGoUtils("protoc-gen-go", config.ProtobufInstallerURL)
-	installer.InstallGoUtils("mockgen", config.MockgenInstallerURL)
-	installer.InstallGoUtils("richgo", config.RichgoInstallerURL)
-	installer.InstallGoUtils("golint", config.GolintInstallerURL)
-	installer.InstallGoUtils("git-chglog", config.ChangeLogInstallerURL)
+	installer.InstallGoLib("protoc-gen-go", config.ProtobufInstallerURL)
+	installer.InstallGoLib("mockgen", config.MockgenInstallerURL)
+	installer.InstallGoLib("richgo", config.RichgoInstallerURL)
+	installer.InstallGoLib("golint", config.GolintInstallerURL)
+	installer.InstallGoLib("gocognit", config.GocognitInstallerURL)
+	installer.InstallGoLib("git-chglog", config.ChangeLogInstallerURL)
 	os.Exit(0)
 }
 
@@ -74,7 +77,7 @@ var protocGenCmd = &cobra.Command{
 func installProtocGenCmd(_ *cobra.Command, _ []string) {
 	installer.CheckExistenceOfGolang()
 	installer.CheckGolangVersion()
-	installer.InstallGoUtils("protoc-gen-go", config.ProtobufInstallerURL)
+	installer.InstallGoLib("protoc-gen-go", config.ProtobufInstallerURL)
 	os.Exit(0)
 }
 
@@ -88,7 +91,7 @@ var mockgenCmd = &cobra.Command{
 func installMockgenCmd(_ *cobra.Command, _ []string) {
 	installer.CheckExistenceOfGolang()
 	installer.CheckGolangVersion()
-	installer.InstallGoUtils("mockgen", config.MockgenInstallerURL)
+	installer.InstallGoLib("mockgen", config.MockgenInstallerURL)
 	os.Exit(0)
 }
 
@@ -102,7 +105,7 @@ var richgoCmd = &cobra.Command{
 func installRichgoCmd(_ *cobra.Command, _ []string) {
 	installer.CheckExistenceOfGolang()
 	installer.CheckGolangVersion()
-	installer.InstallGoUtils("richgo", config.MockgenInstallerURL)
+	installer.InstallGoLib("richgo", config.RichgoInstallerURL)
 	os.Exit(0)
 }
 
@@ -116,7 +119,21 @@ var golintCmd = &cobra.Command{
 func installGolintCmd(_ *cobra.Command, _ []string) {
 	installer.CheckExistenceOfGolang()
 	installer.CheckGolangVersion()
-	installer.InstallGoUtils("golint", config.MockgenInstallerURL)
+	installer.InstallGoLib("golint", config.GolintInstallerURL)
+	os.Exit(0)
+}
+
+var gocognitCmd = &cobra.Command{
+	Use:   "gocognit",
+	Short: "This subcommand to install Gocognit",
+	Long:  "Gocognit calculates cognitive complexities of functions in Go source code. A measurement of how hard does the code is intuitively to understand.",
+	Run:   installGocognitCmd,
+}
+
+func installGocognitCmd(_ *cobra.Command, _ []string) {
+	installer.CheckExistenceOfGolang()
+	installer.CheckGolangVersion()
+	installer.InstallGoLib("gocognit", config.GocognitInstallerURL)
 	os.Exit(0)
 }
 
@@ -130,7 +147,7 @@ var chglogCmd = &cobra.Command{
 func installChglogCmd(_ *cobra.Command, _ []string) {
 	installer.CheckExistenceOfGolang()
 	installer.CheckGolangVersion()
-	installer.InstallGoUtils("git-chglog", config.MockgenInstallerURL)
+	installer.InstallGoLib("git-chglog", config.ChangeLogInstallerURL)
 	os.Exit(0)
 }
 
