@@ -3,7 +3,7 @@ fer is not Ferdian
 
 ## INSTALL
 ```
-go get github.com/kumparan/fer
+GO111MODULE=off go get github.com/kumparan/fer
 ```
 
 It should be available as command now in terminal.
