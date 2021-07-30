@@ -3,13 +3,14 @@ package console
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"net/http"
+	"path/filepath"
+
 	"github.com/blang/semver"
 	"github.com/kumparan/fer/cache"
 	"github.com/kumparan/fer/config"
 	"github.com/spf13/cobra"
-	"io/ioutil"
-	"net/http"
-	"path/filepath"
 )
 
 const (
@@ -81,18 +82,26 @@ func getFerLatestVersionCached() (ver string, err error) {
 }
 
 func checkVersion() {
-	latestVer, err := getFerLatestVersionCached()
-	if err != nil {
-		PrintWarn("Error getting latest version: %s\n", err.Error())
-	}
-	currentVersion, err := semver.Make(config.Version[1:])
+	currentVersion, err := semver.ParseTolerant(config.Version)
 	if err != nil {
 		PrintWarn("Error parsing current version: %s\n", err.Error())
 		return
 	}
-	latestVersion, err := semver.Make(latestVer[1:])
+
+	latestVer, err := getFerLatestVersionCached()
 	if err != nil {
-		PrintWarn("Error parsing latest version: %s\n", err.Error())
+		PrintWarn("Error getting latest version: %s\n", err.Error())
+	}
+
+	var latestVersion semver.Version
+	switch latestVer {
+	case "":
+		PrintWarn("Error parsing latest version empty\n")
+	default:
+		latestVersion, err = semver.ParseTolerant(latestVer)
+		if err != nil {
+			PrintWarn("Error parsing latest version: %s\n", err.Error())
+		}
 	}
 
 	if currentVersion.LT(latestVersion) {
