@@ -26,8 +26,8 @@ var targetMap = map[string]string{
 	"dev-d":   "dev-d",
 	"dev-e":   "dev-e",
 	"dev-f":   "dev-f",
-	"staging": "preview",
-	"prod":    "stable",
+	"staging": "staging",
+	"prod":    "production",
 }
 
 type (
