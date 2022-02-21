@@ -1,7 +1,13 @@
 #Fer 
 
+<a name="v1.10.0"></a>
+## [v1.10.0] - 2022-02-21
+### New Features
+- change deployment tag
+
+
 <a name="v1.9.0"></a>
-## [v1.9.0] - 2021-01-14
+## [v1.9.0] - 2021-01-21
 ### New Features
 - add installation command for gocognit
 
@@ -135,7 +141,8 @@
 - db migrationfile generator ([#3](https://github.com/kumparan/fer/issues/3))
 
 
-[Unreleased]: https://github.com/kumparan/fer/compare/v1.9.0...HEAD
+[Unreleased]: https://github.com/kumparan/fer/compare/v1.10.0...HEAD
+[v1.10.0]: https://github.com/kumparan/fer/compare/v1.9.0...v1.10.0
 [v1.9.0]: https://github.com/kumparan/fer/compare/v1.8.1...v1.9.0
 [v1.8.1]: https://github.com/kumparan/fer/compare/v1.8.0...v1.8.1
 [v1.8.0]: https://github.com/kumparan/fer/compare/v1.7.2...v1.8.0

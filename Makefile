@@ -4,7 +4,7 @@ ifdef test_run
         TEST_ARGS := -run $(test_run)
 endif
 
-changelog_args=-o CHANGELOG.md -p '^v'
+changelog_args=-o CHANGELOG.md --tag-filter-pattern '^v'
 test_command=richgo test ./... $(TEST_ARGS) -v --cover
 
 proto:
