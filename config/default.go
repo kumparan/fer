@@ -7,7 +7,7 @@ import (
 
 const (
 	// GoVersion :nodoc:
-	GoVersion = "1.12.7"
+	GoVersion = "1.18.0"
 	// ChangeLogInstallerURL :nodoc:
 	ChangeLogInstallerURL = "github.com/git-chglog/git-chglog/cmd/git-chglog"
 	// ProtobufInstallerURL :nodoc:
