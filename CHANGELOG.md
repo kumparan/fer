@@ -1,9 +1,15 @@
 #Fer 
 
+<a name="v1.11.0"></a>
+## [v1.11.0] - 2022-09-05
+### New Features
+- update go.mod & libraries
+
+
 <a name="v1.10.0"></a>
 ## [v1.10.0] - 2022-02-21
 ### New Features
-- change deployment tag
+- change deploy tag ([#27](https://github.com/kumparan/fer/issues/27))
 
 
 <a name="v1.9.0"></a>
@@ -141,7 +147,8 @@
 - db migrationfile generator ([#3](https://github.com/kumparan/fer/issues/3))
 
 
-[Unreleased]: https://github.com/kumparan/fer/compare/v1.10.0...HEAD
+[Unreleased]: https://github.com/kumparan/fer/compare/v1.11.0...HEAD
+[v1.11.0]: https://github.com/kumparan/fer/compare/v1.10.0...v1.11.0
 [v1.10.0]: https://github.com/kumparan/fer/compare/v1.9.0...v1.10.0
 [v1.9.0]: https://github.com/kumparan/fer/compare/v1.8.1...v1.9.0
 [v1.8.1]: https://github.com/kumparan/fer/compare/v1.8.0...v1.8.1
