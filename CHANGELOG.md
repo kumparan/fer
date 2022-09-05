@@ -2,6 +2,9 @@
 
 <a name="v1.11.0"></a>
 ## [v1.11.0] - 2022-09-05
+### Fixes
+- fix panic when latestVersion is empty
+
 ### New Features
 - update go.mod & libraries
 
